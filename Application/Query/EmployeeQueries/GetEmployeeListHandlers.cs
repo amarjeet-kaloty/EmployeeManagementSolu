@@ -6,16 +6,16 @@ namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
     public class GetEmployeeListHandlers : IRequestHandler<GetEmployeeListQuery, List<Employee>>
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetEmployeeListHandlers(IEmployeeRepository employeeRepository)
+        public GetEmployeeListHandlers(IUnitOfWork unitOfWork)
         {
-            _employeeRepository = employeeRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<Employee>> Handle(GetEmployeeListQuery request, CancellationToken cancellationToken)
         {
-            return await _employeeRepository.GetEmployeeListAsync();
+            return await _unitOfWork.EmployeeRepository.GetEmployeeListAsync();
         }
     }
 }

@@ -25,7 +25,6 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
 
 builder.Services.AddControllers();

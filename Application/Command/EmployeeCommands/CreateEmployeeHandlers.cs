@@ -8,14 +8,12 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
     public class CreateEmployeeHandlers : IRequestHandler<CreateEmployeeCommand, Employee>
     {
-        private readonly IEmployeeRepository _employeeRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
         private readonly IValidator<Employee> _employeeValidator;
 
-        public CreateEmployeeHandlers(IEmployeeRepository employeeRepository, IUnitOfWork unitOfWork, IMediator mediator, IValidator<Employee> employeeValidator)
+        public CreateEmployeeHandlers(IUnitOfWork unitOfWork, IMediator mediator, IValidator<Employee> employeeValidator)
         {
-            _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
             _mediator = mediator;
             _employeeValidator = employeeValidator;
@@ -33,7 +31,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
                 throw new ValidationException(validationResult.Errors);
             }
 
-            await _employeeRepository.AddEmployeeAsync(employee);
+            await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
 
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
