@@ -11,7 +11,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 
         public UpdateEmployeeHandlers(IEmployeeRepository employeeRepository, IUnitOfWork unitOfWork)
         {
-            this._employeeRepository = employeeRepository;
+            _employeeRepository = employeeRepository;
             _unitOfWork = unitOfWork;
         }
 

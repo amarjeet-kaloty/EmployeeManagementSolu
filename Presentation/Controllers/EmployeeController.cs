@@ -15,7 +15,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
 
         public EmployeeController(IMediator mediator)
         {
-            this._mediator = mediator;
+            _mediator = mediator;
         }
 
         /// <summary>
