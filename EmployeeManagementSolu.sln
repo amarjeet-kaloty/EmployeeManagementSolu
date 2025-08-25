@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmployeeManagementSolu.Presentation.Tests", "EmployeeManagementSolu.Presentation.Tests\EmployeeManagementSolu.Presentation.Tests.csproj", "{25D5D6AC-0FED-45A2-8456-6A0A1C71136A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{BC35E194-3CC8-4803-80AB-1532F58B7FD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{E7F45C52-B01A-400C-BE6C-2A667CDFD07E} = {BC35E194-3CC8-4803-80AB-1532F58B7FD1}
+		{F7F63211-78AD-48A1-B064-7FF9ECDD5F9C} = {BC35E194-3CC8-4803-80AB-1532F58B7FD1}
+		{D55F694B-C44B-43DF-9D80-2C0DADF1C9C9} = {BC35E194-3CC8-4803-80AB-1532F58B7FD1}
+		{2BF6C35B-0FEB-4A01-B73A-46656506642B} = {BC35E194-3CC8-4803-80AB-1532F58B7FD1}
 		{25D5D6AC-0FED-45A2-8456-6A0A1C71136A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

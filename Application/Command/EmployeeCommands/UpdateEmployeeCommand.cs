@@ -6,16 +6,12 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
     public class UpdateEmployeeCommand : IRequest<int>
     {
         public string Id { get; set; }
-
-        public EmployeeName? Name { get; set; }
-
+        public string Name { get; set; }
         public string? Address { get; set; }
-
         public string? Email { get; set; }
-
         public string? Phone { get; set; }
 
-        public UpdateEmployeeCommand(string id, EmployeeName name, string address, string email, string phone)
+        public UpdateEmployeeCommand(string id, string name, string address, string email, string phone)
         {
             Id = id;
             Name = name;

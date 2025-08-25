@@ -7,11 +7,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
     public class CreateEmployeeCommand : IRequest<Employee>
     {
         public string Name { get; set; }
-
         public string Address { get; set; }
-
         public string Email { get; set; }
-
         public string Phone { get; set; }
 
         public CreateEmployeeCommand(string name, string address, string email, string phone)

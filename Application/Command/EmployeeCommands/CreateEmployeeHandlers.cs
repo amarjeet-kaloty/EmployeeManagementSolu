@@ -2,6 +2,7 @@
 using EmployeeManagementSolu.Domain.Events;
 using EmployeeManagementSolu.Domain.Interfaces;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
@@ -24,7 +25,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
            
             Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
             
-            var validationResult = await _employeeValidator.ValidateAsync(employee);
+            ValidationResult validationResult = await _employeeValidator.ValidateAsync(employee);
 
             if (!validationResult.IsValid)
             {
@@ -32,10 +33,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             }
 
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
-
-            await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
             return employee;
         }

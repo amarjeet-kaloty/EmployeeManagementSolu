@@ -11,14 +11,10 @@ namespace Infrastructure
         {
             builder.ToCollection("employees");
 
-            builder.OwnsOne(e => e.Name, name =>
-            {
-                name.Property(n => n.FullName).HasElementName("fullName");
-            });
-
-            builder.Property(e => e.Address).IsRequired();
-            builder.Property(e => e.Email).IsRequired();
-            builder.Property(e => e.Phone).IsRequired(false);
+            builder.Property(e => e.Name).IsRequired().HasMaxLength(50).HasElementName("Employee_Name");
+            builder.Property(e => e.Address).IsRequired().HasMaxLength(200).HasElementName("Employee_Address");
+            builder.Property(e => e.Email).IsRequired().HasElementName("Employee_Email");
+            builder.Property(e => e.Phone).IsRequired(false).HasElementName("Employee_Phone");
         }
     }
 }

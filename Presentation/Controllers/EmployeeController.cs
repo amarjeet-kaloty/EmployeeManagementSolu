@@ -26,7 +26,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The newly created object, including its assigned ID.
         /// </returns>
         [HttpPost]
-        public async Task<ActionResult<Employee>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
+        public async Task<ActionResult<EmployeeDTO>> AddEmployee([FromBody] EmployeeRequestDTO employeeDto)
         {
             CreateEmployeeCommand command = new CreateEmployeeCommand(
                 employeeDto.Name,
@@ -42,7 +42,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
                 return StatusCode(500, "Failed to create employee. An unexpected error occurred.");
             }
 
-            return Ok(newEmployee);
+            return Ok(EmployeeDTO.FromEmployee(newEmployee));
         }
 
         /// <summary>
@@ -53,12 +53,11 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An integer representing the number of rows affected.
         /// </returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<int>> UpdateEmployee(string id, [FromBody] UpdateEmployeeDTO employeeDto)
+        public async Task<ActionResult<int>> UpdateEmployee(string id, [FromBody] EmployeeRequestDTO employeeDto)
         {
-            EmployeeName employeeName = new EmployeeName(employeeDto.Name);
             var command = new UpdateEmployeeCommand(
                 id,
-                employeeName,
+                employeeDto.Name,
                 employeeDto.Address,
                 employeeDto.Email,
                 employeeDto.Phone
@@ -115,7 +114,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(string id)
+        public async Task<ActionResult<EmployeeDTO>> GetEmployee(string id)
         {
             Employee employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
 
@@ -124,7 +123,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
                 return NotFound($"Employee with ID {id} not found.");
             }
 
-            return Ok(employee);
+            return Ok(EmployeeDTO.FromEmployee(employee));
         }
     }
 }

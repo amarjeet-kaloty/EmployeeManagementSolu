@@ -83,7 +83,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             Employee expectedEmployee = new Employee(
                 id: ObjectId.GenerateNewId().ToString(),
-                name: new EmployeeName("Test Employee1"),
+                name: new string("Test Employee1"),
                 address: "123 Praline Ave",
                 email: "employee1@gmail.com",
                 phone: "404-111-1234"
@@ -97,7 +97,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            Employee actualEmployee = Assert.IsType<Employee>(okResult.Value);
+            EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
             Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
             Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
             Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
@@ -126,7 +126,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task AddEmployee_ValidEmployee_ReturnsCreated()
         {
             // Arrange
-            CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
+            EmployeeRequestDTO employeeDto = new EmployeeRequestDTO
             {
                 Name = "Test Employee 1",
                 Address = "123 Praline Ave",
@@ -137,7 +137,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Employee newEmployee = new Employee
             (
                 id: ObjectId.GenerateNewId().ToString(),
-                name: new EmployeeName(employeeDto.Name),
+                name: employeeDto.Name,
                 address: employeeDto.Address,
                 email: employeeDto.Email,
                 phone: employeeDto.Phone
@@ -159,7 +159,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
              cmd.Email == employeeDto.Email));
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var actualEmployee = Assert.IsType<Employee>(okResult.Value);
+            var actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
 
             Assert.Equal(newEmployee.Id, actualEmployee.Id);
             Assert.Equal(newEmployee.Name, actualEmployee.Name);
@@ -172,7 +172,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task AddEmployee_MediatorReturnsNull_ReturnsInternalServerError()
         {
             // Arrange
-            CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
+            EmployeeRequestDTO employeeDto = new EmployeeRequestDTO
             {
                 Name = "Test Employee 1",
                 Address = "123 Praline Ave",
@@ -183,7 +183,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Employee validEmployee = new Employee
             (
                 id: ObjectId.GenerateNewId().ToString(),
-                name: new EmployeeName(employeeDto.Name),
+                name: new string(employeeDto.Name),
                 address: employeeDto.Address,
                 email: employeeDto.Email,
                 phone: employeeDto.Phone
@@ -206,9 +206,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
         {
             // Arrange
             string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-
-            UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
-            {
+            EmployeeRequestDTO updateEmployeeDTO = new EmployeeRequestDTO
+            { 
                 Name = "Update Name",
                 Address = "Updated Address",
                 Email = "updated@gmail.com",
@@ -227,31 +226,11 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task UpdateEmployee_InValidEmployee_ThrowsException()
-        {
-            // Arrange
-            string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-
-            UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
-            {
-                Name = null,
-                Address = "Updated Address",
-                Email = null,
-                Phone = "404-111-1234"
-            };
-
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
-            {
-                await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
-            });
-        }
-
-        [Fact]
         public async Task UpdateEmployee_EmployeeNotFound_ReturnsNotFoundResult()
         {
             // Arrange
-            string nonExistentEmployeeId = ObjectId.GenerateNewId().ToString();
-            UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
+            string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
+            EmployeeRequestDTO updateEmployeeDTO = new EmployeeRequestDTO
             {
                 Name = "Update Name",
                 Address = "Updated Address",
@@ -262,12 +241,12 @@ namespace EmployeeManagementSolu.Presentation.Tests
             _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(Task.FromResult(0));
 
             // Act
-            var result = await _controller.UpdateEmployee(nonExistentEmployeeId, updateEmployeeDTO);
+            var result = await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd => cmd.Id == nonExistentEmployeeId));
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd => cmd.Id == employeeIdToUpdate));
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {nonExistentEmployeeId} not found.", notFoundResult.Value);
+            Assert.Equal($"Employee with ID {employeeIdToUpdate} not found.", notFoundResult.Value);
         }
 
         [Fact]
