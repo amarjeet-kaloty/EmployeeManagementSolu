@@ -32,6 +32,11 @@ namespace EmployeeManagementSolu.Infrastructure
             return 1;
         }
 
+        public async Task<Employee> GetEmployeeByEmailAsync(string email)
+        {
+            return await _dbContext.Employees.FirstOrDefaultAsync(emp => emp.Email == email);
+        }
+
         public async Task<Employee> GetEmployeeByIdAsync(string id)
         {
             return await _dbContext.Employees.FindAsync(id);

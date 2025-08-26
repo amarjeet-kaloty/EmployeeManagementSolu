@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using Application.Query.EmployeeQueries;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Presentation.DTOs;
@@ -99,7 +100,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
-        [HttpGet]
+        [HttpGet("EmployeesList")]
         public async Task<List<Employee>> GetEmployeeList()
         {
             var employeeList = await _mediator.Send(new GetEmployeeListQuery());
@@ -113,7 +114,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
-        [HttpGet("{id}")]
+        [HttpGet("ById")]
         public async Task<ActionResult<EmployeeDTO>> GetEmployee(string id)
         {
             Employee employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
@@ -121,6 +122,19 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             if (employee == null)
             {
                 return NotFound($"Employee with ID {id} not found.");
+            }
+
+            return Ok(EmployeeDTO.FromEmployee(employee));
+        }
+
+        [HttpGet("ByEmail")]
+        public async Task<ActionResult<EmployeeDTO>> GetEmployeeByEmail(string email)
+        {
+            Employee employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+
+            if (employee == null)
+            {
+                return NotFound($"Employee with the email {email} not found.");
             }
 
             return Ok(EmployeeDTO.FromEmployee(employee));

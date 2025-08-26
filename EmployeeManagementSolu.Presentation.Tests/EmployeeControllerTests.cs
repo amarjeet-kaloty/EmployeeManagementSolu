@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using Application.Query.EmployeeQueries;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Presentation.Controllers;
@@ -21,107 +22,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             _controller = new EmployeeController(_mediator);
         }
 
-        [Fact]
-        public async Task GetEmployeeList_ReturnListOfAllEmployees_SuccessAsync()
-        {
-            // Arrange
-            var expectedEmployees = new List<Employee>
-            {
-                Employee.Create(
-                    name: "Test Employee1",
-                    address: "123 Praline Ave",
-                    email: "employee1@gmail.com",
-                    phone: "404-111-1234"
-                ),
-
-                Employee.Create(
-                    name: "Test Employee2",
-                    address: "456 Orange Lane",
-                    email: "employee2@gmail.com",
-                    phone: "505-000-7896"
-                )
-            };
-
-            _mediator.Send(Arg.Any<GetEmployeeListQuery>()).Returns(expectedEmployees);
-
-            // Act
-            var result = await _controller.GetEmployeeList();
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
-
-            Assert.NotNull(result);
-            Assert.Equal(expectedEmployees.Count, result.Count);
-            for (int i = 0; i < result.Count; i++)
-            {
-                Assert.Equal(expectedEmployees[i].Id, result[i].Id);
-                Assert.Equal(expectedEmployees[i].Name, result[i].Name);
-                Assert.Equal(expectedEmployees[i].Address, result[i].Address);
-                Assert.Equal(expectedEmployees[i].Email, result[i].Email);
-                Assert.Equal(expectedEmployees[i].Phone, result[i].Phone);
-            }
-        }
-
-        [Fact]
-        public async Task GetEmployeeList_ReturnsEmptyList_WhenNoEmployeesExist()
-        {
-            // Arrange
-            _mediator.Send(Arg.Any<GetEmployeeListQuery>()).Returns(new List<Employee>());
-
-            // Act
-            var result = await _controller.GetEmployeeList();
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
-            Assert.NotNull(result);
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task GetEmployeeById_ValidId_ReturnsEmployee()
-        {
-            // Arrange
-            Employee expectedEmployee = new Employee(
-                id: ObjectId.GenerateNewId().ToString(),
-                name: new string("Test Employee1"),
-                address: "123 Praline Ave",
-                email: "employee1@gmail.com",
-                phone: "404-111-1234"
-            );
-
-            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(expectedEmployee);
-
-            // Act
-            var result = await _controller.GetEmployee(expectedEmployee.Id);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
-            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
-            Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
-            Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
-            Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
-            Assert.Equal(expectedEmployee.Phone, actualEmployee.Phone);
-        }
-
-        [Fact]
-        public async Task GetEmployeeById_InValidId_FailsToReturnEmployee()
-        {
-            // Arrange
-            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(Task.FromResult<Employee>(null));
-
-            var nonExistentId = ObjectId.GenerateNewId().ToString();
-
-            // Act
-            var result = await _controller.GetEmployee(nonExistentId);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {nonExistentId} not found.", notFoundResult.Value);
-        }
-
+        #region Create Employee
         [Fact]
         public async Task AddEmployee_ValidEmployee_ReturnsCreated()
         {
@@ -200,7 +101,9 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Assert.Equal(500, statusCodeResult.StatusCode);
             Assert.Equal("Failed to create employee. An unexpected error occurred.", statusCodeResult.Value);
         }
+        #endregion
 
+        #region Update Employee
         [Fact]
         public async Task UpdateEmployee_ValidEmployee_ReturnsOkWithUpdatedId()
         {
@@ -248,7 +151,9 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
             Assert.Equal($"Employee with ID {employeeIdToUpdate} not found.", notFoundResult.Value);
         }
+        #endregion
 
+        #region Delete Employee
         [Fact]
         public async Task DeleteEmployee_ValidId_ReturnsOkWithDeletedId()
         {
@@ -285,5 +190,158 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Assert.Equal(404, notFoundResult.StatusCode);
             Assert.Equal($"Employee with ID {nonExistentId} not found for deletion.", notFoundResult.Value);
         }
+        #endregion
+
+        #region GetEmployeeList
+        [Fact]
+        public async Task GetEmployeeList_ReturnListOfAllEmployees_SuccessAsync()
+        {
+            // Arrange
+            var expectedEmployees = new List<Employee>
+            {
+                Employee.Create(
+                    name: "Test Employee1",
+                    address: "123 Praline Ave",
+                    email: "employee1@gmail.com",
+                    phone: "404-111-1234"
+                ),
+
+                Employee.Create(
+                    name: "Test Employee2",
+                    address: "456 Orange Lane",
+                    email: "employee2@gmail.com",
+                    phone: "505-000-7896"
+                )
+            };
+
+            _mediator.Send(Arg.Any<GetEmployeeListQuery>()).Returns(expectedEmployees);
+
+            // Act
+            var result = await _controller.GetEmployeeList();
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
+
+            Assert.NotNull(result);
+            Assert.Equal(expectedEmployees.Count, result.Count);
+            for (int i = 0; i < result.Count; i++)
+            {
+                Assert.Equal(expectedEmployees[i].Id, result[i].Id);
+                Assert.Equal(expectedEmployees[i].Name, result[i].Name);
+                Assert.Equal(expectedEmployees[i].Address, result[i].Address);
+                Assert.Equal(expectedEmployees[i].Email, result[i].Email);
+                Assert.Equal(expectedEmployees[i].Phone, result[i].Phone);
+            }
+        }
+
+        [Fact]
+        public async Task GetEmployeeList_ReturnsEmptyList_WhenNoEmployeesExist()
+        {
+            // Arrange
+            _mediator.Send(Arg.Any<GetEmployeeListQuery>()).Returns(new List<Employee>());
+
+            // Act
+            var result = await _controller.GetEmployeeList();
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+        #endregion
+
+        #region GetEmployeeById
+        [Fact]
+        public async Task GetEmployeeById_ValidId_ReturnsEmployee()
+        {
+            // Arrange
+            Employee expectedEmployee = new Employee(
+                id: ObjectId.GenerateNewId().ToString(),
+                name: new string("Test Employee1"),
+                address: "123 Praline Ave",
+                email: "employee1@gmail.com",
+                phone: "404-111-1234"
+            );
+
+            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(expectedEmployee);
+
+            // Act
+            var result = await _controller.GetEmployee(expectedEmployee.Id);
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
+            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
+            Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
+            Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
+            Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
+            Assert.Equal(expectedEmployee.Phone, actualEmployee.Phone);
+        }
+
+        [Fact]
+        public async Task GetEmployeeById_InValidId_FailsToReturnEmployee()
+        {
+            // Arrange
+            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(Task.FromResult<Employee>(null));
+
+            string nonExistentId = ObjectId.GenerateNewId().ToString();
+
+            // Act
+            var result = await _controller.GetEmployee(nonExistentId);
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal($"Employee with ID {nonExistentId} not found.", notFoundResult.Value);
+        }
+        #endregion
+
+        #region GetEmployeeByEmail
+        [Fact]
+        public async Task GetEmployeeByIEmail_EmailExists_ReturnsEmployee()
+        {
+            // Arrange
+            Employee expectedEmployee = new Employee(
+                id: ObjectId.GenerateNewId().ToString(),
+                name: new string("Test Employee1"),
+                address: "123 Praline Ave",
+                email: "employee1@gmail.com",
+                phone: "404-111-1234"
+            );
+
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(expectedEmployee);
+
+            // Act
+            var result = await _controller.GetEmployeeByEmail(expectedEmployee.Email);
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
+            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
+            Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
+            Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
+            Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
+            Assert.Equal(expectedEmployee.Phone, actualEmployee.Phone);
+        }
+
+        [Fact]
+        public async Task GetEmployeeByIEmail_InvalidEmail_FailsToReturnEmployee()
+        {
+            // Arrange
+            string nonExistentEmail = "This mail does not exits.";
+
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<Employee>(null));
+
+            // Act
+            var result = await _controller.GetEmployeeByEmail(nonExistentEmail);
+
+            // Assert
+            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal($"Employee with the email {nonExistentEmail} not found.", notFoundResult.Value);
+        }
+        #endregion
     }
 }

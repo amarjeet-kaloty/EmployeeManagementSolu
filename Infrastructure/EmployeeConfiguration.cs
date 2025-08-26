@@ -27,6 +27,8 @@ namespace Infrastructure
             builder.Property(e => e.Phone)
                 .IsRequired(false)
                 .HasElementName("Employee_Phone");
+
+            builder.HasIndex(e => e.Email).IsUnique(true);
         }
     }
 }
