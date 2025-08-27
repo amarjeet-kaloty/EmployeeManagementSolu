@@ -1,10 +1,9 @@
-﻿
-using EmployeeManagementSolu.Domain.Entities;
+﻿using EmployeeManagementSolu.Application.DTOs;
 using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
-    public class CreateEmployeeCommand : IRequest<Employee>
+    public class CreateEmployeeCommand : IRequest<EmployeeDTO>
     {
         public string Name { get; set; }
         public string Address { get; set; }

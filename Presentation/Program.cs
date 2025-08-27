@@ -1,12 +1,12 @@
 using EmployeeManagementSolu.Infrastructure;
 using EmployeeManagementSolu.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using MediatR;
 using FluentValidation;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Application.Validation;
 using MongoDB.Driver;
+using Application.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +31,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile(new EmployeeProfile());
+});
 
 var app = builder.Build();
 

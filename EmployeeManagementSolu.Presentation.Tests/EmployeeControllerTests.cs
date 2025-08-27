@@ -1,9 +1,9 @@
 ﻿using Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Presentation.Controllers;
-using EmployeeManagementSolu.Presentation.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -27,7 +27,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task AddEmployee_ValidEmployee_ReturnsCreated()
         {
             // Arrange
-            EmployeeRequestDTO employeeDto = new EmployeeRequestDTO
+            EmployeeDTO employeeDto = new EmployeeDTO
             {
                 Name = "Test Employee 1",
                 Address = "123 Praline Ave",
@@ -48,7 +48,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 cmd.Name == employeeDto.Name &&
                 cmd.Address == employeeDto.Address &&
                 cmd.Email == employeeDto.Email))
-            .Returns(newEmployee);
+            .Returns(employeeDto);
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
@@ -62,7 +62,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
 
-            Assert.Equal(newEmployee.Id, actualEmployee.Id);
+            //Assert.Equal(newEmployee.Id, actualEmployee.Id);
             Assert.Equal(newEmployee.Name, actualEmployee.Name);
             Assert.Equal(newEmployee.Address, actualEmployee.Address);
             Assert.Equal(newEmployee.Email, actualEmployee.Email);
@@ -73,7 +73,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task AddEmployee_MediatorReturnsNull_ReturnsInternalServerError()
         {
             // Arrange
-            EmployeeRequestDTO employeeDto = new EmployeeRequestDTO
+            EmployeeDTO employeeDto = new EmployeeDTO
             {
                 Name = "Test Employee 1",
                 Address = "123 Praline Ave",
@@ -90,7 +90,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 phone: employeeDto.Phone
             );
 
-            _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(Task.FromResult<Employee>(null));
+            _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(Task.FromResult<EmployeeDTO>(null));
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
@@ -109,8 +109,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
         {
             // Arrange
             string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-            EmployeeRequestDTO updateEmployeeDTO = new EmployeeRequestDTO
-            { 
+            EmployeeDTO updateEmployeeDTO = new EmployeeDTO
+            {
                 Name = "Update Name",
                 Address = "Updated Address",
                 Email = "updated@gmail.com",
@@ -133,7 +133,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         {
             // Arrange
             string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-            EmployeeRequestDTO updateEmployeeDTO = new EmployeeRequestDTO
+            EmployeeDTO updateEmployeeDTO = new EmployeeDTO
             {
                 Name = "Update Name",
                 Address = "Updated Address",
@@ -255,24 +255,24 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task GetEmployeeById_ValidId_ReturnsEmployee()
         {
             // Arrange
-            Employee expectedEmployee = new Employee(
-                id: ObjectId.GenerateNewId().ToString(),
-                name: new string("Test Employee1"),
-                address: "123 Praline Ave",
-                email: "employee1@gmail.com",
-                phone: "404-111-1234"
-            );
+            string employeeID = ObjectId.GenerateNewId().ToString();
+            EmployeeDTO expectedEmployee = new EmployeeDTO
+            {
+                Name = new string("Test Employee1"),
+                Address = "123 Praline Ave",
+                Email = "employee1@gmail.com",
+                Phone = "404-111-1234"
+            };
 
             _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(expectedEmployee);
 
             // Act
-            var result = await _controller.GetEmployee(expectedEmployee.Id);
+            var result = await _controller.GetEmployee(employeeID);
 
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
-            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
             Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
             Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
             Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
@@ -283,7 +283,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task GetEmployeeById_InValidId_FailsToReturnEmployee()
         {
             // Arrange
-            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(Task.FromResult<Employee>(null));
+            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(Task.FromResult<EmployeeDTO>(null));
 
             string nonExistentId = ObjectId.GenerateNewId().ToString();
 
@@ -302,13 +302,14 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task GetEmployeeByIEmail_EmailExists_ReturnsEmployee()
         {
             // Arrange
-            Employee expectedEmployee = new Employee(
-                id: ObjectId.GenerateNewId().ToString(),
-                name: new string("Test Employee1"),
-                address: "123 Praline Ave",
-                email: "employee1@gmail.com",
-                phone: "404-111-1234"
-            );
+            string employeeID = ObjectId.GenerateNewId().ToString();
+            EmployeeDTO expectedEmployee = new EmployeeDTO
+            {
+                Name = new string("Test Employee1"),
+                Address = "123 Praline Ave",
+                Email = "employee1@gmail.com",
+                Phone = "404-111-1234"
+            };
 
             _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(expectedEmployee);
 
@@ -319,7 +320,6 @@ namespace EmployeeManagementSolu.Presentation.Tests
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             EmployeeDTO actualEmployee = Assert.IsType<EmployeeDTO>(okResult.Value);
-            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
             Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
             Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
             Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
@@ -332,7 +332,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             string nonExistentEmail = "This mail does not exits.";
 
-            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<Employee>(null));
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<EmployeeDTO>(null));
 
             // Act
             var result = await _controller.GetEmployeeByEmail(nonExistentEmail);

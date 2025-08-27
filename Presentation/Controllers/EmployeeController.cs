@@ -1,8 +1,8 @@
 ﻿using Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Entities;
-using EmployeeManagementSolu.Presentation.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +27,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The newly created object, including its assigned ID.
         /// </returns>
         [HttpPost]
-        public async Task<ActionResult<EmployeeDTO>> AddEmployee([FromBody] EmployeeRequestDTO employeeDto)
+        public async Task<ActionResult<EmployeeDTO>> AddEmployee([FromBody] EmployeeDTO employeeDto)
         {
             CreateEmployeeCommand command = new CreateEmployeeCommand(
                 employeeDto.Name,
@@ -36,14 +36,14 @@ namespace EmployeeManagementSolu.Presentation.Controllers
                 employeeDto.Phone!
             );
 
-            Employee newEmployee = await _mediator.Send(command);
+            EmployeeDTO newEmployeeDto = await _mediator.Send(command);
 
-            if (newEmployee == null)
+            if (newEmployeeDto == null)
             {
                 return StatusCode(500, "Failed to create employee. An unexpected error occurred.");
             }
 
-            return Ok(EmployeeDTO.FromEmployee(newEmployee));
+            return Ok(newEmployeeDto);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An integer representing the number of rows affected.
         /// </returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<int>> UpdateEmployee(string id, [FromBody] EmployeeRequestDTO employeeDto)
+        public async Task<ActionResult<int>> UpdateEmployee(string id, [FromBody] EmployeeDTO employeeDto)
         {
             var command = new UpdateEmployeeCommand(
                 id,
@@ -117,27 +117,27 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpGet("ById")]
         public async Task<ActionResult<EmployeeDTO>> GetEmployee(string id)
         {
-            Employee employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
+            EmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
 
             if (employee == null)
             {
                 return NotFound($"Employee with ID {id} not found.");
             }
 
-            return Ok(EmployeeDTO.FromEmployee(employee));
+            return Ok(employee);
         }
 
         [HttpGet("ByEmail")]
         public async Task<ActionResult<EmployeeDTO>> GetEmployeeByEmail(string email)
         {
-            Employee employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+            EmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
 
             if (employee == null)
             {
                 return NotFound($"Employee with the email {email} not found.");
             }
 
-            return Ok(EmployeeDTO.FromEmployee(employee));
+            return Ok(employee);
         }
     }
 }

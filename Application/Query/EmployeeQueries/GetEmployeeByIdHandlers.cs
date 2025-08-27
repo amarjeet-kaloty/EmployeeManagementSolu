@@ -1,21 +1,25 @@
-﻿using EmployeeManagementSolu.Domain.Entities;
+﻿using AutoMapper;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
 
 namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
-    public class GetEmployeeByIdHandlers : IRequestHandler<GetEmployeeByIdQuery, Employee>
+    public class GetEmployeeByIdHandlers : IRequestHandler<GetEmployeeByIdQuery, EmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public GetEmployeeByIdHandlers(IUnitOfWork unitOfWork)
+        public GetEmployeeByIdHandlers(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<Employee> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<EmployeeDTO> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
+            var employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
+            return _mapper.Map<EmployeeDTO>(employee);
         }
     }
 }
