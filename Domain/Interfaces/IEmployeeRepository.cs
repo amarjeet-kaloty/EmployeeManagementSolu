@@ -10,5 +10,6 @@ namespace EmployeeManagementSolu.Domain.Interfaces
         public Task<List<Employee>> GetEmployeeListAsync();
         public void UpdateEmployee(Employee employee);
         public Task<Employee> GetEmployeeByEmailAsync(string email);
+        public IQueryable<Employee> GetAllAsQueryable();
     }
 }

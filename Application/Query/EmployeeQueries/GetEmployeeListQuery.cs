@@ -1,9 +1,9 @@
-﻿using EmployeeManagementSolu.Domain.Entities;
+﻿using Application.DTOs;
 using MediatR;
 
 namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
-    public class GetEmployeeListQuery : IRequest<List<Employee>>
+    public class GetEmployeeListQuery : IRequest<List<EmployeeResponseDTO>>
     {
     }
 }

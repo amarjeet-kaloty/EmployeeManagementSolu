@@ -1,12 +1,13 @@
-﻿using AutoMapper;
-using EmployeeManagementSolu.Application.DTOs;
-using EmployeeManagementSolu.Domain.Entities;
+﻿using Application.DTOs;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Query.EmployeeQueries
 {
-    public class GetEmployeeByEmailHandlers : IRequestHandler<GetEmployeeByEmailQuery, EmployeeDTO>
+    public class GetEmployeeByEmailHandlers : IRequestHandler<GetEmployeeByEmailQuery, EmployeeSearchDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -17,10 +18,20 @@ namespace Application.Query.EmployeeQueries
             _mapper = mapper;
         }
 
-        public async Task<EmployeeDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
+        public async Task<EmployeeSearchDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
         {
-            Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
-            return _mapper.Map<EmployeeDTO>(employee);
+            // Implemented using Search DTO.
+            // Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
+            // return _mapper.Map<EmployeeSearchDTO>(employee);
+
+            // Using Projections
+            var query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
+                .Where(e => e.Email == request.Email);
+
+            EmployeeSearchDTO? employeeDto = await query.ProjectTo<EmployeeSearchDTO>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return employeeDto!;
         }
     }
 }

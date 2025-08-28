@@ -1,4 +1,5 @@
-﻿using Application.Query.EmployeeQueries;
+﻿using Application.DTOs;
+using Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
@@ -29,14 +30,12 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeDTO>> AddEmployee([FromBody] EmployeeDTO employeeDto)
         {
-            CreateEmployeeCommand command = new CreateEmployeeCommand(
+            EmployeeResponseDTO newEmployeeDto = await _mediator.Send(new CreateEmployeeCommand(
                 employeeDto.Name,
                 employeeDto.Address,
                 employeeDto.Email,
                 employeeDto.Phone!
-            );
-
-            EmployeeDTO newEmployeeDto = await _mediator.Send(command);
+            ));
 
             if (newEmployeeDto == null)
             {
@@ -61,7 +60,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
                 employeeDto.Name,
                 employeeDto.Address,
                 employeeDto.Email,
-                employeeDto.Phone
+                employeeDto.Phone!
             );
 
             int updatedEmployee = await _mediator.Send(command);
@@ -101,9 +100,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
         [HttpGet("EmployeesList")]
-        public async Task<List<Employee>> GetEmployeeList()
+        public async Task<List<EmployeeResponseDTO>> GetEmployeeList()
         {
-            var employeeList = await _mediator.Send(new GetEmployeeListQuery());
+            List<EmployeeResponseDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
             return employeeList;
         }
 
@@ -115,9 +114,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
         [HttpGet("ById")]
-        public async Task<ActionResult<EmployeeDTO>> GetEmployee(string id)
+        public async Task<ActionResult<EmployeeResponseDTO>> GetEmployee(string id)
         {
-            EmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
+            EmployeeResponseDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
 
             if (employee == null)
             {
@@ -128,9 +127,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         }
 
         [HttpGet("ByEmail")]
-        public async Task<ActionResult<EmployeeDTO>> GetEmployeeByEmail(string email)
+        public async Task<ActionResult<EmployeeSearchDTO>> GetEmployeeByEmail(string email)
         {
-            EmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+            EmployeeSearchDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
 
             if (employee == null)
             {

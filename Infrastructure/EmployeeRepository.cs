@@ -18,6 +18,11 @@ namespace EmployeeManagementSolu.Infrastructure
             await _dbContext.Employees.AddAsync(employee);
         }
 
+        public void UpdateEmployee(Employee employee)
+        {
+            _dbContext.Employees.Update(employee);
+        }
+
         public async Task<int> DeleteEmployeeAsync(string id)
         {
             var employeeToDelete = await _dbContext.Employees.FindAsync(id);
@@ -30,6 +35,11 @@ namespace EmployeeManagementSolu.Infrastructure
             _dbContext.Employees.Remove(employeeToDelete);
 
             return 1;
+        }
+
+        public IQueryable<Employee> GetAllAsQueryable()
+        {
+            return _dbContext.Employees.AsQueryable();
         }
 
         public async Task<Employee> GetEmployeeByEmailAsync(string email)
@@ -46,11 +56,6 @@ namespace EmployeeManagementSolu.Infrastructure
         {
             List<Employee> employees = await _dbContext.Employees.ToListAsync();
             return employees;
-        }
-
-        public void UpdateEmployee(Employee employee)
-        {
-            _dbContext.Employees.Update(employee);
         }
     }
 }
