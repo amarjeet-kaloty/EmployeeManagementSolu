@@ -1,10 +1,10 @@
-﻿using Application.DTOs;
+﻿using EmployeeManagementSolu.Application.DTOs;
 using MediatR;
 
-namespace Application.Query.EmployeeQueries
+namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
     public class GetEmployeeByEmailQuery : IRequest<EmployeeSearchDTO>
     {
-        public required string Email { get; set; }
+        public string Email { get; set; }
     }
 }

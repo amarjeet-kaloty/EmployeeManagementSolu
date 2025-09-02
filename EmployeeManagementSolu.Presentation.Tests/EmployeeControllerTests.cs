@@ -1,17 +1,11 @@
-﻿using Application.DTOs;
-using Application.Query.EmployeeQueries;
-using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
-using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Presentation.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using NSubstitute;
-using System.Net;
-using System.Numerics;
-using System.Xml.Linq;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {
@@ -96,7 +90,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Assert.Equal(500, statusCodeResult.StatusCode);
             Assert.Equal("Failed to create employee. An unexpected error occurred.", statusCodeResult.Value);
         }
-        #endregion
+        #endregion Create Employee
 
         #region Update Employee
         [Fact]
@@ -112,15 +106,28 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(1);
+            EmployeeResponseDTO expectedEmployeeDTO = new EmployeeResponseDTO
+            {
+                Id = employeeIdToUpdate,
+                Name = updateEmployeeDTO.Name,
+                Address = updateEmployeeDTO.Address,
+                Email = updateEmployeeDTO.Email,
+                Phone = updateEmployeeDTO.Phone
+            };
+
+            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(expectedEmployeeDTO);
 
             // Act
             var result = await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var actualUpdatedId = Assert.IsType<int>(okResult.Value);
-            Assert.Equal(1, actualUpdatedId);
+            EmployeeResponseDTO actualUpdatedEmployeeDTO = Assert.IsType<EmployeeResponseDTO>(okResult.Value);
+            Assert.Equal(expectedEmployeeDTO.Id, actualUpdatedEmployeeDTO.Id);
+            Assert.Equal(expectedEmployeeDTO.Name, actualUpdatedEmployeeDTO.Name);
+            Assert.Equal(expectedEmployeeDTO.Address, actualUpdatedEmployeeDTO.Address);
+            Assert.Equal(expectedEmployeeDTO.Email, actualUpdatedEmployeeDTO.Email);
+            Assert.Equal(expectedEmployeeDTO.Phone, actualUpdatedEmployeeDTO.Phone);
         }
 
         [Fact]
@@ -131,12 +138,12 @@ namespace EmployeeManagementSolu.Presentation.Tests
             EmployeeDTO updateEmployeeDTO = new EmployeeDTO
             {
                 Name = "Update Name",
-                Address = "Updated Address",
-                Email = null,
+                Address = "Update Address",
+                Email = "updated@gmail.com",
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(Task.FromResult(0));
+            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(Task.FromResult<EmployeeResponseDTO>(null!));
 
             // Act
             var result = await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
@@ -144,9 +151,9 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd => cmd.Id == employeeIdToUpdate));
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {employeeIdToUpdate} not found.", notFoundResult.Value);
+            Assert.Equal($"Employee with ID {employeeIdToUpdate} not found", notFoundResult.Value);
         }
-        #endregion
+        #endregion Update Employee
 
         #region Delete Employee
         [Fact]
@@ -185,7 +192,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Assert.Equal(404, notFoundResult.StatusCode);
             Assert.Equal($"Employee with ID {nonExistentId} not found for deletion.", notFoundResult.Value);
         }
-        #endregion
+        #endregion Delete Employee
 
         #region GetEmployeeList
         [Fact]
@@ -249,7 +256,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             Assert.NotNull(result);
             Assert.Empty(result);
         }
-        #endregion
+        #endregion GetEmployeeList
 
         #region GetEmployeeById
         [Fact]
@@ -298,7 +305,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
             Assert.Equal($"Employee with ID {nonExistentId} not found.", notFoundResult.Value);
         }
-        #endregion
+        #endregion GetEmployeeById
 
         #region GetEmployeeByEmail
         [Fact]
@@ -343,6 +350,6 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
             Assert.Equal($"Employee with the email {nonExistentEmail} not found.", notFoundResult.Value);
         }
-        #endregion
+        #endregion GetEmployeeByEmail
     }
 }

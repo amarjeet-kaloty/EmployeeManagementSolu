@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson;
-using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeManagementSolu.Domain.Entities
 {
@@ -32,14 +31,6 @@ namespace EmployeeManagementSolu.Domain.Entities
                 phone);
 
             return employee;
-        }
-
-        public void UpdateDetails(string name, string address, string email, string? phone)
-        {
-            Name = name;
-            Address = address;
-            Email = email;
-            Phone = phone;
         }
     }
 }

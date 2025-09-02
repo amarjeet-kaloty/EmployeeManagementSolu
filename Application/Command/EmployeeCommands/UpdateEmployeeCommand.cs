@@ -1,9 +1,9 @@
-﻿using EmployeeManagementSolu.Domain.Entities;
+﻿using EmployeeManagementSolu.Application.DTOs;
 using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
-    public class UpdateEmployeeCommand : IRequest<int>
+    public class UpdateEmployeeCommand : IRequest<EmployeeResponseDTO>
     {
         public string Id { get; set; }
         public string Name { get; set; }

@@ -1,6 +1,7 @@
-﻿using Application.DTOs;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using EmployeeManagementSolu.Application.DTOs;
+using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ namespace Application.Query.EmployeeQueries
             // Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
             // return _mapper.Map<EmployeeSearchDTO>(employee);
 
-            // Using Projections
+            // Implemented using Projections
             var query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
                 .Where(e => e.Email == request.Email);
 

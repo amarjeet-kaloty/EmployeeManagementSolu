@@ -1,5 +1,4 @@
-﻿using Application.DTOs;
-using AutoMapper;
+﻿using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Events;
@@ -27,9 +26,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 
         public async Task<EmployeeResponseDTO> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-           
             Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
-            
+
             ValidationResult validationResult = await _employeeValidator.ValidateAsync(employee);
 
             if (!validationResult.IsValid)

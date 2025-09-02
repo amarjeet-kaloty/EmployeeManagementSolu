@@ -1,5 +1,4 @@
-﻿
-using EmployeeManagementSolu.Domain.Entities;
+﻿using EmployeeManagementSolu.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagementSolu.Infrastructure

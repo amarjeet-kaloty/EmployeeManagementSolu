@@ -1,5 +1,6 @@
-﻿using Application.DTOs;
-using AutoMapper;
+﻿using AutoMapper;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
 
 namespace Application.Mappers
@@ -8,16 +9,15 @@ namespace Application.Mappers
     {
         public EmployeeProfile()
         {
-            // Mapper returning full Employee DTO
-            CreateMap<Employee, EmployeeResponseDTO>();
+            CreateMap<Employee, EmployeeResponseDTO>()
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone ?? string.Empty));
 
-            // Mapper returning partial Employee DTO using ForMember
             CreateMap<Employee, EmployeeSearchDTO>()
                 .ForMember(dest => dest.EmployeeId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.ContactEmail, opt => opt.MapFrom(src => src.Email));
 
-            CreateProjection<Employee, EmployeeResponseDTO>();
+            CreateMap<UpdateEmployeeCommand, Employee>();
         }
     }
 }

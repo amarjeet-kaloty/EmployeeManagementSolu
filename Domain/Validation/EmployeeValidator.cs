@@ -5,7 +5,7 @@ namespace EmployeeManagementSolu.Application.Validation
 {
     public class EmployeeValidator : AbstractValidator<Employee>
     {
-        public EmployeeValidator() 
+        public EmployeeValidator()
         {
             RuleFor(emp => emp.Name)
                 .NotEmpty().WithMessage("Name is required.")

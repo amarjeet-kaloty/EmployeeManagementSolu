@@ -1,9 +1,6 @@
-﻿using Application.DTOs;
-using Application.Query.EmployeeQueries;
-using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
-using EmployeeManagementSolu.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +25,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The newly created object, including its assigned ID.
         /// </returns>
         [HttpPost]
-        public async Task<ActionResult<EmployeeDTO>> AddEmployee([FromBody] EmployeeDTO employeeDto)
+        public async Task<ActionResult<EmployeeResponseDTO>> AddEmployee([FromBody] EmployeeDTO employeeDto)
         {
             EmployeeResponseDTO newEmployeeDto = await _mediator.Send(new CreateEmployeeCommand(
                 employeeDto.Name,
@@ -53,21 +50,19 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An integer representing the number of rows affected.
         /// </returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<int>> UpdateEmployee(string id, [FromBody] EmployeeDTO employeeDto)
+        public async Task<ActionResult<EmployeeResponseDTO>> UpdateEmployee(string id, [FromBody] EmployeeDTO employeeDto)
         {
-            var command = new UpdateEmployeeCommand(
+            EmployeeResponseDTO updatedEmployee = await _mediator.Send(new UpdateEmployeeCommand(
                 id,
                 employeeDto.Name,
                 employeeDto.Address,
                 employeeDto.Email,
                 employeeDto.Phone!
-            );
+            ));
 
-            int updatedEmployee = await _mediator.Send(command);
-
-            if (updatedEmployee == 0)
+            if (updatedEmployee == null)
             {
-                return NotFound($"Employee with ID {id} not found.");
+                return NotFound($"Employee with ID {id} not found");
             }
 
             return Ok(updatedEmployee);
@@ -126,6 +121,13 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             return Ok(employee);
         }
 
+        /// <summary>
+        /// Retrieves a specific employee by their unique email.
+        /// </summary>
+        /// <param name="email">The unique email identifier of the employee to retrieve.</param>
+        /// <returns>
+        /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
+        /// </returns>
         [HttpGet("ByEmail")]
         public async Task<ActionResult<EmployeeSearchDTO>> GetEmployeeByEmail(string email)
         {

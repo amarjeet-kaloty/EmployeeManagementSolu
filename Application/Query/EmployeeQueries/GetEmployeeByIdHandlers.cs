@@ -1,5 +1,5 @@
-﻿using Application.DTOs;
-using AutoMapper;
+﻿using AutoMapper;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
 

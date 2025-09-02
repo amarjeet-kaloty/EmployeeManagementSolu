@@ -1,12 +1,12 @@
-using EmployeeManagementSolu.Infrastructure;
-using EmployeeManagementSolu.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
-using FluentValidation;
-using EmployeeManagementSolu.Domain.Entities;
-using EmployeeManagementSolu.Application.Validation;
-using MongoDB.Driver;
 using Application.Mappers;
+using EmployeeManagementSolu.Application.Validation;
+using EmployeeManagementSolu.Domain.Entities;
+using EmployeeManagementSolu.Domain.Interfaces;
+using EmployeeManagementSolu.Infrastructure;
+using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
