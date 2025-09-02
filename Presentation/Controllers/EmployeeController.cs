@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using AutoMapper;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using MediatR;
@@ -11,10 +12,12 @@ namespace EmployeeManagementSolu.Presentation.Controllers
     public class EmployeeController : ControllerBase
     {
         private IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IMediator mediator)
+        public EmployeeController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -25,18 +28,13 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The newly created object, including its assigned ID.
         /// </returns>
         [HttpPost]
-        public async Task<ActionResult<EmployeeResponseDTO>> AddEmployee([FromBody] EmployeeDTO employeeDto)
+        public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
-            EmployeeResponseDTO newEmployeeDto = await _mediator.Send(new CreateEmployeeCommand(
-                employeeDto.Name,
-                employeeDto.Address,
-                employeeDto.Email,
-                employeeDto.Phone!
-            ));
+            ReadEmployeeDTO newEmployeeDto = await _mediator.Send(_mapper.Map<CreateEmployeeCommand>(employeeDto));
 
             if (newEmployeeDto == null)
             {
-                return StatusCode(500, "Failed to create employee. An unexpected error occurred.");
+                return BadRequest("The employee could not be created. Please check the data provided and try again.");
             }
 
             return Ok(newEmployeeDto);
@@ -49,20 +47,14 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An integer representing the number of rows affected.
         /// </returns>
-        [HttpPut("{id}")]
-        public async Task<ActionResult<EmployeeResponseDTO>> UpdateEmployee(string id, [FromBody] EmployeeDTO employeeDto)
+        [HttpPut]
+        public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
-            EmployeeResponseDTO updatedEmployee = await _mediator.Send(new UpdateEmployeeCommand(
-                id,
-                employeeDto.Name,
-                employeeDto.Address,
-                employeeDto.Email,
-                employeeDto.Phone!
-            ));
+            ReadEmployeeDTO updatedEmployee = await _mediator.Send(_mapper.Map<UpdateEmployeeCommand>(employeeDto));
 
             if (updatedEmployee == null)
             {
-                return NotFound($"Employee with ID {id} not found");
+                return NotFound($"Employee with ID {employeeDto.Id} not found");
             }
 
             return Ok(updatedEmployee);
@@ -95,9 +87,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
         [HttpGet("EmployeesList")]
-        public async Task<List<EmployeeResponseDTO>> GetEmployeeList()
+        public async Task<List<ReadEmployeeDTO>> GetEmployeeList()
         {
-            List<EmployeeResponseDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
+            List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
             return employeeList;
         }
 
@@ -109,9 +101,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
         [HttpGet("ById")]
-        public async Task<ActionResult<EmployeeResponseDTO>> GetEmployee(string id)
+        public async Task<ActionResult<ReadEmployeeDTO>> GetEmployee(string id)
         {
-            EmployeeResponseDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
+            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
 
             if (employee == null)
             {

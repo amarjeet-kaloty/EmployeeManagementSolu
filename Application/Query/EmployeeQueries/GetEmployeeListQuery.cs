@@ -3,7 +3,7 @@ using MediatR;
 
 namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
-    public class GetEmployeeListQuery : IRequest<List<EmployeeResponseDTO>>
+    public class GetEmployeeListQuery : IRequest<List<ReadEmployeeDTO>>
     {
     }
 }

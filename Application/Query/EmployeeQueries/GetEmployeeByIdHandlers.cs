@@ -5,7 +5,7 @@ using MediatR;
 
 namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
 {
-    public class GetEmployeeByIdHandlers : IRequestHandler<GetEmployeeByIdQuery, EmployeeResponseDTO>
+    public class GetEmployeeByIdHandlers : IRequestHandler<GetEmployeeByIdQuery, ReadEmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -16,10 +16,10 @@ namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
             _mapper = mapper;
         }
 
-        public async Task<EmployeeResponseDTO> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ReadEmployeeDTO> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
         {
             var employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
-            return _mapper.Map<EmployeeResponseDTO>(employee);
+            return _mapper.Map<ReadEmployeeDTO>(employee);
         }
     }
 }

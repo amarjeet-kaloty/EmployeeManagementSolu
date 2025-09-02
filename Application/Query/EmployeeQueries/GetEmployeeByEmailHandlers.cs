@@ -21,11 +21,6 @@ namespace Application.Query.EmployeeQueries
 
         public async Task<EmployeeSearchDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
         {
-            // Implemented using Search DTO.
-            // Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
-            // return _mapper.Map<EmployeeSearchDTO>(employee);
-
-            // Implemented using Projections
             var query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
                 .Where(e => e.Email == request.Email);
 

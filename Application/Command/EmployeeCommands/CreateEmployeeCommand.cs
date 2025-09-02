@@ -3,7 +3,7 @@ using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
-    public class CreateEmployeeCommand : IRequest<EmployeeResponseDTO>
+    public class CreateEmployeeCommand : IRequest<ReadEmployeeDTO>
     {
         public string Name { get; set; }
         public string Address { get; set; }

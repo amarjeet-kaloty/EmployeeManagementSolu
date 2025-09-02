@@ -9,7 +9,7 @@ using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
-    public class CreateEmployeeHandlers : IRequestHandler<CreateEmployeeCommand, EmployeeResponseDTO>
+    public class CreateEmployeeHandlers : IRequestHandler<CreateEmployeeCommand, ReadEmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
@@ -24,7 +24,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             _mapper = mapper;
         }
 
-        public async Task<EmployeeResponseDTO> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
+        public async Task<ReadEmployeeDTO> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
             Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
 
@@ -39,7 +39,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
-            return _mapper.Map<EmployeeResponseDTO>(employee);
+            return _mapper.Map<ReadEmployeeDTO>(employee);
         }
     }
 }
