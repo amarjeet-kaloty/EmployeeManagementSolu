@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using AutoMapper;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Presentation.Controllers;
@@ -12,12 +13,14 @@ namespace EmployeeManagementSolu.Presentation.Tests
     public class EmployeeControllerTests
     {
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
         private readonly EmployeeController _controller;
 
         public EmployeeControllerTests()
         {
             _mediator = Substitute.For<IMediator>();
-            _controller = new EmployeeController(_mediator);
+            _mapper = Substitute.For<IMapper>();
+            _controller = new EmployeeController(_mediator, _mapper);
         }
 
         #region Create Employee
@@ -42,12 +45,11 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = employeeDto.Phone
             };
 
-            _mediator.Send(Arg.Is<CreateEmployeeCommand>(cmd =>
-                cmd.Name == employeeDto.Name &&
-                cmd.Address == employeeDto.Address &&
-                cmd.Email == employeeDto.Email &&
-                cmd.Phone == employeeDto.Phone))
-            .Returns(newEmployeeDTO);
+            _mapper.Map<CreateEmployeeCommand>(employeeDto).Returns(
+                new CreateEmployeeCommand(employeeDto.Name, employeeDto.Address, employeeDto.Email, employeeDto.Phone)
+            );
+
+            _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(newEmployeeDTO);
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
@@ -56,7 +58,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
             await _mediator.Received(1).Send(Arg.Is<CreateEmployeeCommand>(cmd =>
              cmd.Name == employeeDto.Name &&
              cmd.Address == employeeDto.Address &&
-             cmd.Email == employeeDto.Email));
+             cmd.Email == employeeDto.Email &&
+             cmd.Phone == employeeDto.Phone));
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var actualEmployee = Assert.IsType<ReadEmployeeDTO>(okResult.Value);
@@ -68,7 +71,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task AddEmployee_MediatorReturnsNull_ReturnsInternalServerError()
+        public async Task AddEmployee_MediatorReturnsNull_ReturnsBadRequest()
         {
             // Arrange
             CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
@@ -79,16 +82,23 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
+            _mapper.Map<CreateEmployeeCommand>(employeeDto).Returns(
+                new CreateEmployeeCommand(employeeDto.Name, employeeDto.Address, employeeDto.Email, employeeDto.Phone)
+            );
+
             _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Any<CreateEmployeeCommand>());
-            var statusCodeResult = Assert.IsType<ObjectResult>(result.Result);
-            Assert.Equal(500, statusCodeResult.StatusCode);
-            Assert.Equal("Failed to create employee. An unexpected error occurred.", statusCodeResult.Value);
+            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeCommand>(cmd =>
+             cmd.Name == employeeDto.Name &&
+             cmd.Address == employeeDto.Address &&
+             cmd.Email == employeeDto.Email &&
+             cmd.Phone == employeeDto.Phone));
+            var statusCodeResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("The employee could not be created. Please try again.", statusCodeResult.Value);
         }
         #endregion Create Employee
 
@@ -97,9 +107,9 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task UpdateEmployee_ValidEmployee_ReturnsOkWithUpdatedId()
         {
             // Arrange
-            string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-            EmployeeDTO updateEmployeeDTO = new EmployeeDTO
+            UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
             {
+                Id = ObjectId.GenerateNewId().ToString(),
                 Name = "Update Name",
                 Address = "Updated Address",
                 Email = "updated@gmail.com",
@@ -108,19 +118,35 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             ReadEmployeeDTO expectedEmployeeDTO = new ReadEmployeeDTO
             {
-                Id = employeeIdToUpdate,
+                Id = updateEmployeeDTO.Id,
                 Name = updateEmployeeDTO.Name,
                 Address = updateEmployeeDTO.Address,
                 Email = updateEmployeeDTO.Email,
                 Phone = updateEmployeeDTO.Phone
             };
 
+            _mapper.Map<UpdateEmployeeCommand>(updateEmployeeDTO).Returns(
+                new UpdateEmployeeCommand(
+                    expectedEmployeeDTO.Id, 
+                    expectedEmployeeDTO.Name, 
+                    expectedEmployeeDTO.Address, 
+                    expectedEmployeeDTO.Email, 
+                    expectedEmployeeDTO.Phone)
+            );
+
             _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(expectedEmployeeDTO);
 
             // Act
-            var result = await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
+            var result = await _controller.UpdateEmployee(updateEmployeeDTO);
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd =>
+                cmd.Id == updateEmployeeDTO.Id &&
+                cmd.Name == updateEmployeeDTO.Name &&
+                cmd.Address == updateEmployeeDTO.Address &&
+                cmd.Email == updateEmployeeDTO.Email &&
+                cmd.Phone == updateEmployeeDTO.Phone));
+
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             ReadEmployeeDTO actualUpdatedEmployeeDTO = Assert.IsType<ReadEmployeeDTO>(okResult.Value);
             Assert.Equal(expectedEmployeeDTO.Id, actualUpdatedEmployeeDTO.Id);
@@ -134,24 +160,38 @@ namespace EmployeeManagementSolu.Presentation.Tests
         public async Task UpdateEmployee_EmployeeNotFound_ReturnsNotFoundResult()
         {
             // Arrange
-            string employeeIdToUpdate = ObjectId.GenerateNewId().ToString();
-            EmployeeDTO updateEmployeeDTO = new EmployeeDTO
+            UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
             {
+                Id = ObjectId.GenerateNewId().ToString(),
                 Name = "Update Name",
                 Address = "Update Address",
                 Email = "updated@gmail.com",
                 Phone = "404-111-1234"
             };
 
+            _mapper.Map<UpdateEmployeeCommand>(updateEmployeeDTO).Returns(
+                new UpdateEmployeeCommand(
+                    updateEmployeeDTO.Id,
+                    updateEmployeeDTO.Name,
+                    updateEmployeeDTO.Address,
+                    updateEmployeeDTO.Email,
+                    updateEmployeeDTO.Phone)
+            );
+
             _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
-            var result = await _controller.UpdateEmployee(employeeIdToUpdate, updateEmployeeDTO);
+            var result = await _controller.UpdateEmployee(updateEmployeeDTO);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd => cmd.Id == employeeIdToUpdate));
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd =>
+                cmd.Id == updateEmployeeDTO.Id &&
+                cmd.Name == updateEmployeeDTO.Name &&
+                cmd.Address == updateEmployeeDTO.Address &&
+                cmd.Email == updateEmployeeDTO.Email &&
+                cmd.Phone == updateEmployeeDTO.Phone));
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {employeeIdToUpdate} not found", notFoundResult.Value);
+            Assert.Equal($"Employee with ID {updateEmployeeDTO.Id} not found", notFoundResult.Value);
         }
         #endregion Update Employee
 
@@ -313,25 +353,29 @@ namespace EmployeeManagementSolu.Presentation.Tests
         {
             // Arrange
             string employeeID = ObjectId.GenerateNewId().ToString();
-            EmployeeSearchDTO expectedEmployee = new EmployeeSearchDTO
+            ReadEmployeeDTO expectedEmployee = new ReadEmployeeDTO
             {
-                EmployeeId = ObjectId.GenerateNewId().ToString(),
-                FullName = "Test Employee1",
-                ContactEmail = "employee1@gmail.com"
+                Id = ObjectId.GenerateNewId().ToString(),
+                Name = "Test Employee1",
+                Address = "123 Praline Ave",
+                Email = "employee1@gmail.com",
+                Phone = "404-111-1234"
             };
 
             _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(expectedEmployee);
 
             // Act
-            var result = await _controller.GetEmployeeByEmail(expectedEmployee.ContactEmail);
+            var result = await _controller.GetEmployeeByEmail(expectedEmployee.Email);
 
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            EmployeeSearchDTO actualEmployee = Assert.IsType<EmployeeSearchDTO>(okResult.Value);
-            Assert.Equal(expectedEmployee.EmployeeId, actualEmployee.EmployeeId);
-            Assert.Equal(expectedEmployee.FullName, actualEmployee.FullName);
-            Assert.Equal(expectedEmployee.ContactEmail, actualEmployee.ContactEmail);
+            ReadEmployeeDTO actualEmployee = Assert.IsType<ReadEmployeeDTO>(okResult.Value);
+            Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
+            Assert.Equal(expectedEmployee.Name, actualEmployee.Name);
+            Assert.Equal(expectedEmployee.Address, actualEmployee.Address);
+            Assert.Equal(expectedEmployee.Email, actualEmployee.Email);
+            Assert.Equal(expectedEmployee.Phone, actualEmployee.Phone);
         }
 
         [Fact]
@@ -340,7 +384,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             string nonExistentEmail = "This mail does not exits.";
 
-            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<EmployeeSearchDTO>(null!));
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
             var result = await _controller.GetEmployeeByEmail(nonExistentEmail);

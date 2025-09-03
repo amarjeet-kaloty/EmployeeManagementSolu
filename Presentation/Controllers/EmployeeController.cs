@@ -34,7 +34,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
 
             if (newEmployeeDto == null)
             {
-                return BadRequest("The employee could not be created. Please check the data provided and try again.");
+                return BadRequest("The employee could not be created. Please try again.");
             }
 
             return Ok(newEmployeeDto);
@@ -45,7 +45,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// </summary>
         /// <param name="employeeDto">The data transfer object containing the details of the employee to be updated.</param>
         /// <returns>
-        /// An integer representing the number of rows affected.
+        /// The updated object.
         /// </returns>
         [HttpPut]
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
@@ -121,9 +121,9 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
         /// </returns>
         [HttpGet("ByEmail")]
-        public async Task<ActionResult<EmployeeSearchDTO>> GetEmployeeByEmail(string email)
+        public async Task<ActionResult<ReadEmployeeDTO>> GetEmployeeByEmail(string email)
         {
-            EmployeeSearchDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
 
             if (employee == null)
             {

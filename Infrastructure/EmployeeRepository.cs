@@ -54,8 +54,7 @@ namespace EmployeeManagementSolu.Infrastructure
 
         public async Task<List<Employee>> GetEmployeeListAsync()
         {
-            List<Employee> employees = await _dbContext.Employees.ToListAsync();
-            return employees;
+            return await _dbContext.Employees.ToListAsync(); 
         }
     }
 }

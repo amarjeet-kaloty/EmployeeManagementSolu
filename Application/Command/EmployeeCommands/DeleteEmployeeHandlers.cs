@@ -20,9 +20,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             {
                 return 0;
             }
-
             await _unitOfWork.EmployeeRepository.DeleteEmployeeAsync(request.Id);
-
             int affectedRows = await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return affectedRows;

@@ -20,10 +20,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
         public async Task<ReadEmployeeDTO> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
         {
             Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
-
             if (employee == null)
                 return null!;
-
             _mapper.Map(request, employee);
             _unitOfWork.EmployeeRepository.UpdateEmployee(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

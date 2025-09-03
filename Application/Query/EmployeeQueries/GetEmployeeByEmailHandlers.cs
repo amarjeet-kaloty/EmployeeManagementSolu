@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Query.EmployeeQueries
 {
-    public class GetEmployeeByEmailHandlers : IRequestHandler<GetEmployeeByEmailQuery, EmployeeSearchDTO>
+    public class GetEmployeeByEmailHandlers : IRequestHandler<GetEmployeeByEmailQuery, ReadEmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -19,12 +19,11 @@ namespace Application.Query.EmployeeQueries
             _mapper = mapper;
         }
 
-        public async Task<EmployeeSearchDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
+        public async Task<ReadEmployeeDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
         {
-            var query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
+            IQueryable query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
                 .Where(e => e.Email == request.Email);
-
-            EmployeeSearchDTO? employeeDto = await query.ProjectTo<EmployeeSearchDTO>(_mapper.ConfigurationProvider)
+            ReadEmployeeDTO? employeeDto = await query.ProjectTo<ReadEmployeeDTO>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(cancellationToken);
 
             return employeeDto!;

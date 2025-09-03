@@ -27,14 +27,11 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
         public async Task<ReadEmployeeDTO> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
             Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
-
             ValidationResult validationResult = await _employeeValidator.ValidateAsync(employee);
-
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
             }
-
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
