@@ -13,14 +13,12 @@ namespace EmployeeManagementSolu.Presentation.Tests
     public class EmployeeControllerTests
     {
         private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
         private readonly EmployeeController _controller;
 
         public EmployeeControllerTests()
         {
             _mediator = Substitute.For<IMediator>();
-            _mapper = Substitute.For<IMapper>();
-            _controller = new EmployeeController(_mediator, _mapper);
+            _controller = new EmployeeController(_mediator);
         }
 
         #region Create Employee
@@ -45,17 +43,13 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = employeeDto.Phone
             };
 
-            _mapper.Map<CreateEmployeeCommand>(employeeDto).Returns(
-                new CreateEmployeeCommand(employeeDto.Name, employeeDto.Address, employeeDto.Email, employeeDto.Phone)
-            );
-
-            _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(newEmployeeDTO);
+            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).Returns(newEmployeeDTO);
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeCommand>(cmd =>
+            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
              cmd.Name == employeeDto.Name &&
              cmd.Address == employeeDto.Address &&
              cmd.Email == employeeDto.Email &&
@@ -82,17 +76,13 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mapper.Map<CreateEmployeeCommand>(employeeDto).Returns(
-                new CreateEmployeeCommand(employeeDto.Name, employeeDto.Address, employeeDto.Email, employeeDto.Phone)
-            );
-
             _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeCommand>(cmd =>
+            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
              cmd.Name == employeeDto.Name &&
              cmd.Address == employeeDto.Address &&
              cmd.Email == employeeDto.Email &&
@@ -125,22 +115,13 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = updateEmployeeDTO.Phone
             };
 
-            _mapper.Map<UpdateEmployeeCommand>(updateEmployeeDTO).Returns(
-                new UpdateEmployeeCommand(
-                    expectedEmployeeDTO.Id, 
-                    expectedEmployeeDTO.Name, 
-                    expectedEmployeeDTO.Address, 
-                    expectedEmployeeDTO.Email, 
-                    expectedEmployeeDTO.Phone)
-            );
-
-            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(expectedEmployeeDTO);
+            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).Returns(expectedEmployeeDTO);
 
             // Act
             var result = await _controller.UpdateEmployee(updateEmployeeDTO);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd =>
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
                 cmd.Id == updateEmployeeDTO.Id &&
                 cmd.Name == updateEmployeeDTO.Name &&
                 cmd.Address == updateEmployeeDTO.Address &&
@@ -169,22 +150,13 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mapper.Map<UpdateEmployeeCommand>(updateEmployeeDTO).Returns(
-                new UpdateEmployeeCommand(
-                    updateEmployeeDTO.Id,
-                    updateEmployeeDTO.Name,
-                    updateEmployeeDTO.Address,
-                    updateEmployeeDTO.Email,
-                    updateEmployeeDTO.Phone)
-            );
-
-            _mediator.Send(Arg.Any<UpdateEmployeeCommand>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
+            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
             var result = await _controller.UpdateEmployee(updateEmployeeDTO);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeCommand>(cmd =>
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
                 cmd.Id == updateEmployeeDTO.Id &&
                 cmd.Name == updateEmployeeDTO.Name &&
                 cmd.Address == updateEmployeeDTO.Address &&

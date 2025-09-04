@@ -9,13 +9,9 @@ namespace Application.Mappers
     {
         public EmployeeProfile()
         {
-            CreateMap<CreateEmployeeDTO, CreateEmployeeCommand>();
-
-            CreateMap<UpdateEmployeeDTO, UpdateEmployeeCommand>();
-
-            CreateMap<UpdateEmployeeCommand, Employee>();
-
             CreateMap<Employee, ReadEmployeeDTO>();
+
+            CreateMap<UpdateEmployeeDTO, Employee>();
         }
     }
 }

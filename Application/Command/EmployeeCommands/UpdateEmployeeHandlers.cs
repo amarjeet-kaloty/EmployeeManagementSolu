@@ -6,7 +6,7 @@ using MediatR;
 
 namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 {
-    public class UpdateEmployeeHandlers : IRequestHandler<UpdateEmployeeCommand, ReadEmployeeDTO>
+    public class UpdateEmployeeHandlers : IRequestHandler<UpdateEmployeeDTO, ReadEmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -17,9 +17,9 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             _mapper = mapper;
         }
 
-        public async Task<ReadEmployeeDTO> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
+        public async Task<ReadEmployeeDTO> Handle(UpdateEmployeeDTO request, CancellationToken cancellationToken)
         {
-            Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
+            Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id!);
             if (employee == null)
                 return null!;
             _mapper.Map(request, employee);

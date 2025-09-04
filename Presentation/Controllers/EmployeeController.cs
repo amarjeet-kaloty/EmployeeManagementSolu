@@ -11,13 +11,11 @@ namespace EmployeeManagementSolu.Presentation.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private IMediator _mediator;
-        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public EmployeeController(IMediator mediator, IMapper mapper)
+        public EmployeeController(IMediator mediator)
         {
             _mediator = mediator;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,7 +28,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
-            ReadEmployeeDTO newEmployeeDto = await _mediator.Send(_mapper.Map<CreateEmployeeCommand>(employeeDto));
+            ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
 
             if (newEmployeeDto == null)
             {
@@ -50,7 +48,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpPut]
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
-            ReadEmployeeDTO updatedEmployee = await _mediator.Send(_mapper.Map<UpdateEmployeeCommand>(employeeDto));
+            ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
 
             if (updatedEmployee == null)
             {

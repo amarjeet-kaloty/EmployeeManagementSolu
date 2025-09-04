@@ -27,9 +27,6 @@ namespace Infrastructure
             builder.Property(e => e.Phone)
                 .IsRequired(false)
                 .HasElementName("Employee_Phone");
-
-            // Does not work when configured here.
-            // builder.HasIndex(e => e.Email).IsUnique(true);
         }
     }
 }

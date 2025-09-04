@@ -1,7 +1,7 @@
 using Application.Mappers;
-using EmployeeManagementSolu.Application.Validation;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
+using EmployeeManagementSolu.Domain.Validation;
 using EmployeeManagementSolu.Infrastructure;
 using FluentValidation;
 using MediatR;
@@ -26,6 +26,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
+builder.Services.AddScoped<EmployeeValidationService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

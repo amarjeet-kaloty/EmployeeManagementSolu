@@ -1,7 +1,9 @@
 ﻿
+using MediatR;
+
 namespace EmployeeManagementSolu.Application.DTOs
 {
-    public class CreateEmployeeDTO
+    public class CreateEmployeeDTO : IRequest<ReadEmployeeDTO>
     {
         public required string Name { get; set; }
         public required string Address { get; set; }

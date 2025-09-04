@@ -1,7 +1,7 @@
 ﻿using EmployeeManagementSolu.Domain.Entities;
 using FluentValidation;
 
-namespace EmployeeManagementSolu.Application.Validation
+namespace EmployeeManagementSolu.Domain.Validation
 {
     public class EmployeeValidator : AbstractValidator<Employee>
     {

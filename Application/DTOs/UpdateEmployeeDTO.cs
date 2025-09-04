@@ -1,6 +1,8 @@
-﻿namespace EmployeeManagementSolu.Application.DTOs
+﻿using MediatR;
+
+namespace EmployeeManagementSolu.Application.DTOs
 {
-    public class UpdateEmployeeDTO
+    public class UpdateEmployeeDTO : IRequest<ReadEmployeeDTO>
     {
         public string? Id { get; set; }
         public string? Name { get; set; }
