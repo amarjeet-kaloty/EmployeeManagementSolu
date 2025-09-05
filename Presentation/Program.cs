@@ -1,4 +1,7 @@
 using Application.Mappers;
+using Application.Validations;
+using Domain.Validation;
+using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
 using EmployeeManagementSolu.Domain.Validation;
@@ -12,6 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddMediatR(typeof(EmployeeManagementSolu.Application.Command.EmployeeCommands.CreateEmployeeCommand).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EmployeeDTOValidator<,>));
+
+
 var connectionString = builder.Configuration.GetConnectionString("MongoDB");
 builder.Services.AddSingleton(new MongoClient(connectionString));
 builder.Services.AddSingleton(serviceProvider =>
@@ -24,9 +30,10 @@ builder.Services.AddDbContext<DataContext>(options =>
     var database = builder.Services.BuildServiceProvider().GetRequiredService<IMongoDatabase>();
     options.UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName);
 });
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
-builder.Services.AddScoped<EmployeeValidationService>();
+builder.Services.AddScoped<IValidator<CreateEmployeeDTO>, EmployeeDTOValidator>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

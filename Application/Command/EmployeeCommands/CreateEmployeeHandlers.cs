@@ -13,20 +13,18 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        private readonly EmployeeValidationService _validationService;
 
-        public CreateEmployeeHandlers(IUnitOfWork unitOfWork, IMediator mediator, IMapper mapper, EmployeeValidationService validationService)
+        public CreateEmployeeHandlers(IUnitOfWork unitOfWork, IMediator mediator, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
             _mapper = mapper;
-            _validationService = validationService;
         }
 
         public async Task<ReadEmployeeDTO> Handle(CreateEmployeeDTO request, CancellationToken cancellationToken)
         {
             Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
-            await _validationService.ValidateAsync(employee);
+
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
