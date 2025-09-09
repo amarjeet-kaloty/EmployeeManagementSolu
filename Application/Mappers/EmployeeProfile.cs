@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
+using MongoDB.Bson;
 
 namespace Application.Mappers
 {
@@ -9,9 +9,12 @@ namespace Application.Mappers
     {
         public EmployeeProfile()
         {
-            CreateMap<Employee, ReadEmployeeDTO>();
+            CreateMap<Employee, ReadEmployeeDTO>().ReverseMap();
 
-            CreateMap<UpdateEmployeeDTO, Employee>();
+            CreateMap<UpdateEmployeeDTO, Employee>().ReverseMap();
+
+            CreateMap<CreateEmployeeDTO, Employee>()
+                .ConstructUsing(dto => new Employee(ObjectId.GenerateNewId(), dto.Name, dto.Address, dto.Email, dto.Phone));
         }
     }
 }

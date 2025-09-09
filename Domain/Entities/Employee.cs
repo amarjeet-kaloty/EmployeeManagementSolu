@@ -13,7 +13,7 @@ namespace EmployeeManagementSolu.Domain.Entities
         {
         }
 
-        public Employee(string id, string name, string address, string email, string? phone) : base(id)
+        public Employee(ObjectId id, string name, string address, string email, string? phone) : base(id.ToString())
         {
             Name = name;
             Address = address;

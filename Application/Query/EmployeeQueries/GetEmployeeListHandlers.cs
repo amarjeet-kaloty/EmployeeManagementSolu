@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
-using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
 
@@ -20,9 +19,9 @@ namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
         public async Task<List<ReadEmployeeDTO>> Handle(GetEmployeeListQuery request, CancellationToken cancellationToken)
         {
             var employeeList = await _unitOfWork.EmployeeRepository.GetEmployeeListAsync();
-            var readEmployeeDTO = _mapper.Map<List<ReadEmployeeDTO>>(employeeList);
+            List<ReadEmployeeDTO> readEmployeeDTOList = _mapper.Map<List<ReadEmployeeDTO>>(employeeList);
 
-            return readEmployeeDTO;
+            return readEmployeeDTOList;
         }
     }
 }

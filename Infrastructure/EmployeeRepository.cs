@@ -25,26 +25,13 @@ namespace EmployeeManagementSolu.Infrastructure
 
         public async Task<int> DeleteEmployeeAsync(string id)
         {
-            var employeeToDelete = await _dbContext.Employees.FindAsync(id);
-
-            if (employeeToDelete == null)
-            {
-                return 0;
-            }
-
-            _dbContext.Employees.Remove(employeeToDelete);
-
+            _dbContext.Employees.Remove(await _dbContext.Employees.FindAsync(id));
             return 1;
         }
 
-        public IQueryable<Employee> GetAllAsQueryable()
+        public async Task<List<Employee>> GetEmployeeListAsync()
         {
-            return _dbContext.Employees.AsQueryable();
-        }
-
-        public async Task<Employee> GetEmployeeByEmailAsync(string email)
-        {
-            return await _dbContext.Employees.FirstOrDefaultAsync(emp => emp.Email == email);
+            return await _dbContext.Employees.ToListAsync();
         }
 
         public async Task<Employee> GetEmployeeByIdAsync(string id)
@@ -52,9 +39,9 @@ namespace EmployeeManagementSolu.Infrastructure
             return await _dbContext.Employees.FindAsync(id);
         }
 
-        public async Task<List<Employee>> GetEmployeeListAsync()
+        public async Task<Employee> GetEmployeeByEmailAsync(string email)
         {
-            return await _dbContext.Employees.ToListAsync(); 
+            return await _dbContext.Employees.FirstOrDefaultAsync(emp => emp.Email == email);
         }
     }
 }

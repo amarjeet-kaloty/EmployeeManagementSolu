@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Exceptions;
+using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
@@ -21,7 +22,9 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
         {
             Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id!);
             if (employee == null)
-                return null!;
+            {
+                throw new NotFoundException($"Employee with ID {request.Id} not found.");
+            }
             _mapper.Map(request, employee);
             _unitOfWork.EmployeeRepository.UpdateEmployee(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -51,7 +51,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             }
         }
 
-        /// <summary>
+        /// <summary> 
         /// Updates the existing employee in the system.
         /// </summary>
         /// <param name="employeeDto">The data transfer object containing the details of the employee to be updated.</param>
@@ -60,6 +60,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// </returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
@@ -71,6 +72,10 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             catch (AutoMapperMappingException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
@@ -113,10 +118,23 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
         [HttpGet("EmployeesList")]
-        public async Task<List<ReadEmployeeDTO>> GetEmployeeList()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeeList()
         {
-            List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
-            return employeeList;
+            try
+            {
+                List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
+                return Ok(employeeList);
+            }
+            catch (AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -127,16 +145,28 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
         [HttpGet("ById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployee(string id)
         {
-            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
-
-            if (employee == null)
+            try
             {
-                return NotFound($"Employee with ID {id} not found.");
+                ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
+                return Ok(employee);
             }
-
-            return Ok(employee);
+            catch (AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -147,16 +177,28 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
         /// </returns>
         [HttpGet("ByEmail")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployeeByEmail(string email)
         {
-            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
-
-            if (employee == null)
+            try
             {
-                return NotFound($"Employee with the email {email} not found.");
+                ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+                return Ok(employee);
             }
-
-            return Ok(employee);
+            catch (AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

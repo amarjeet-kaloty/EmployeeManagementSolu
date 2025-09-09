@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Domain.Entities;
+﻿using Application.Exceptions;
+using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
 

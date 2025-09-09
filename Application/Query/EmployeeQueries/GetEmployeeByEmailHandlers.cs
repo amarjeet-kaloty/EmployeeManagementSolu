@@ -1,10 +1,9 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using Application.Exceptions;
+using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Query.EmployeeQueries
 {
@@ -22,7 +21,11 @@ namespace Application.Query.EmployeeQueries
         public async Task<ReadEmployeeDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
         {
             var employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
-            var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
+            if (employee == null)
+            {
+                throw new NotFoundException($"Employee with email {request.Email} not found.");
+            }
+            ReadEmployeeDTO readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
 
             return readEmployeeDTO;
         }

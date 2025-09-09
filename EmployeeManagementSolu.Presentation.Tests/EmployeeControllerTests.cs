@@ -1,12 +1,15 @@
-﻿using AutoMapper;
+﻿using Application.Exceptions;
+using AutoMapper;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Presentation.Controllers;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {
@@ -65,7 +68,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task AddEmployee_MediatorReturnsNull_ReturnsBadRequest()
+        public async Task AddEmployee_ValidationException_ReturnsBadRequest()
         {
             // Arrange
             CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
@@ -76,7 +79,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
+            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(new ValidationException("Simulated validation error"));
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);
@@ -87,8 +90,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
              cmd.Address == employeeDto.Address &&
              cmd.Email == employeeDto.Email &&
              cmd.Phone == employeeDto.Phone));
-            var statusCodeResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal("The employee could not be created. Please try again.", statusCodeResult.Value);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Simulated validation error", badRequestResult.Value);
         }
         #endregion Create Employee
 
@@ -138,7 +141,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task UpdateEmployee_EmployeeNotFound_ReturnsNotFoundResult()
+        public async Task UpdateEmployee_ThrowsException_ReturnsBadRequest()
         {
             // Arrange
             UpdateEmployeeDTO updateEmployeeDTO = new UpdateEmployeeDTO
@@ -150,7 +153,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
+            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).ThrowsAsync(new Exception("Simulated error"));
 
             // Act
             var result = await _controller.UpdateEmployee(updateEmployeeDTO);
@@ -162,8 +165,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 cmd.Address == updateEmployeeDTO.Address &&
                 cmd.Email == updateEmployeeDTO.Email &&
                 cmd.Phone == updateEmployeeDTO.Phone));
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {updateEmployeeDTO.Id} not found", notFoundResult.Value);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Simulated error", badRequestResult.Value);
         }
         #endregion Update Employee
 
@@ -188,21 +191,20 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task DeleteEmployee_EmployeeNotFound_ReturnsNotFoundResult()
+        public async Task DeleteEmployee_ThrowsEmployeeNotFoundException_ReturnsNotFoundResult()
         {
             // Arrange
             string nonExistentId = ObjectId.GenerateNewId().ToString();
 
-            _mediator.Send(Arg.Any<DeleteEmployeeCommand>()).Returns(Task.FromResult(0));
+            _mediator.Send(Arg.Any<DeleteEmployeeCommand>()).ThrowsAsync(new NotFoundException($"Employee with ID {nonExistentId} not found."));
 
             // Act
             var result = await _controller.DeleteEmployee(nonExistentId);
 
             // Assert
             await _mediator.Received(1).Send(Arg.Is<DeleteEmployeeCommand>(cmd => cmd.Id == nonExistentId));
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal(404, notFoundResult.StatusCode);
-            Assert.Equal($"Employee with ID {nonExistentId} not found for deletion.", notFoundResult.Value);
+            var badRequestResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+            Assert.Equal($"Employee with ID {nonExistentId} not found.", badRequestResult.Value);
         }
         #endregion Delete Employee
 
@@ -242,15 +244,16 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
 
-            Assert.NotNull(result);
-            Assert.Equal(expectedEmployees.Count, result.Count);
-            for (int i = 0; i < result.Count; i++)
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var actualEmployeesList = Assert.IsType<List<ReadEmployeeDTO>>(okResult.Value);
+            Assert.Equal(expectedEmployees.Count, actualEmployeesList.Count);
+            for (int i = 0; i < actualEmployeesList.Count; i++)
             {
-                Assert.Equal(expectedEmployees[i].Id, result[i].Id);
-                Assert.Equal(expectedEmployees[i].Name, result[i].Name);
-                Assert.Equal(expectedEmployees[i].Address, result[i].Address);
-                Assert.Equal(expectedEmployees[i].Email, result[i].Email);
-                Assert.Equal(expectedEmployees[i].Phone, result[i].Phone);
+                Assert.Equal(expectedEmployees[i].Id, actualEmployeesList[i].Id);
+                Assert.Equal(expectedEmployees[i].Name, actualEmployeesList[i].Name);
+                Assert.Equal(expectedEmployees[i].Address, actualEmployeesList[i].Address);
+                Assert.Equal(expectedEmployees[i].Email, actualEmployeesList[i].Email);
+                Assert.Equal(expectedEmployees[i].Phone, actualEmployeesList[i].Phone);
             }
         }
 
@@ -266,7 +269,9 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeListQuery>());
             Assert.NotNull(result);
-            Assert.Empty(result);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var actualEmployeesList = Assert.IsType<List<ReadEmployeeDTO>>(okResult.Value);
+            Assert.Empty(actualEmployeesList);
         }
         #endregion GetEmployeeList
 
@@ -302,20 +307,20 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task GetEmployeeById_InValidId_FailsToReturnEmployee()
+        public async Task GetEmployeeById_InValidIdThrowsException_ReturnsBadRequest()
         {
             // Arrange
-            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
-
             string nonExistentId = ObjectId.GenerateNewId().ToString();
+
+            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).ThrowsAsync(new AutoMapperMappingException("Simulated automapping error."));
 
             // Act
             var result = await _controller.GetEmployee(nonExistentId);
 
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {nonExistentId} not found.", notFoundResult.Value);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal($"Simulated automapping error.", badRequestResult.Value);
         }
         #endregion GetEmployeeById
 
@@ -351,12 +356,12 @@ namespace EmployeeManagementSolu.Presentation.Tests
         }
 
         [Fact]
-        public async Task GetEmployeeByIEmail_InvalidEmail_FailsToReturnEmployee()
+        public async Task GetEmployeeByIEmail_ThrowsNotFoundException_ReturnsNotFoundResult()
         {
             // Arrange
-            string nonExistentEmail = "This mail does not exits.";
+            string nonExistentEmail = "emailnotexist@gmail.com";
 
-            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).ThrowsAsync(new NotFoundException($"Employee with email {nonExistentEmail} not found."));
 
             // Act
             var result = await _controller.GetEmployeeByEmail(nonExistentEmail);
@@ -364,7 +369,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with the email {nonExistentEmail} not found.", notFoundResult.Value);
+            Assert.Equal($"Employee with email {nonExistentEmail} not found.", notFoundResult.Value);
         }
         #endregion GetEmployeeByEmail
     }

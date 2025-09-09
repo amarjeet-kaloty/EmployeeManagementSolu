@@ -29,8 +29,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             await _validationService.ValidateAsync(employee);
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
             var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
+            await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
             return readEmployeeDTO;
         }
