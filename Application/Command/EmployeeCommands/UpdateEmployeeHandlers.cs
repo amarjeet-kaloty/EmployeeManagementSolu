@@ -25,8 +25,9 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             _mapper.Map(request, employee);
             _unitOfWork.EmployeeRepository.UpdateEmployee(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
 
-            return _mapper.Map<ReadEmployeeDTO>(employee);
+            return readEmployeeDTO;
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using Application.Exceptions;
+using AutoMapper;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,16 +28,27 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The newly created object, including its assigned ID.
         /// </returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
-            ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
-
-            if (newEmployeeDto == null)
+            try
             {
-                return BadRequest("The employee could not be created. Please try again.");
+                ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
+                return Ok(newEmployeeDto);
             }
-
-            return Ok(newEmployeeDto);
+            catch (AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -46,16 +59,23 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// The updated object.
         /// </returns>
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
-            ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
-
-            if (updatedEmployee == null)
+            try
             {
-                return NotFound($"Employee with ID {employeeDto.Id} not found");
+                ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
+                return Ok(updatedEmployee);
             }
-
-            return Ok(updatedEmployee);
+            catch (AutoMapperMappingException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -66,16 +86,24 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// An integer representing the number of rows affected (typically 1 for successful deletion).
         /// </returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> DeleteEmployee(string id)
         {
-            int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
-
-            if (employeeDeletedCount == 0)
+            try
             {
-                return NotFound($"Employee with ID {id} not found for deletion.");
+                int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
+                return Ok(id);
             }
-
-            return Ok(id);
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>

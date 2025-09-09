@@ -76,7 +76,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<CreateEmployeeCommand>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
+            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).Returns(Task.FromResult<ReadEmployeeDTO>(null!));
 
             // Act
             var result = await _controller.AddEmployee(employeeDto);

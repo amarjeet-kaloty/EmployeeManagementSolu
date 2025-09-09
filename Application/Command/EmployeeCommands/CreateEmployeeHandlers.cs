@@ -25,13 +25,14 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
 
         public async Task<ReadEmployeeDTO> Handle(CreateEmployeeDTO request, CancellationToken cancellationToken)
         {
-            Employee employee = Employee.Create(request.Name, request.Address, request.Email, request.Phone);
+            var employee = _mapper.Map<Employee>(request);
             await _validationService.ValidateAsync(employee);
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
+            var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
 
-            return _mapper.Map<ReadEmployeeDTO>(employee);
+            return readEmployeeDTO;
         }
     }
 }

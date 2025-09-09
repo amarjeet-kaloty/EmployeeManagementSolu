@@ -19,7 +19,9 @@ namespace EmployeeManagementSolu.Application.Query.EmployeeQueries
         public async Task<ReadEmployeeDTO> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
         {
             var employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
-            return _mapper.Map<ReadEmployeeDTO>(employee);
+            var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
+
+            return readEmployeeDTO;
         }
     }
 }

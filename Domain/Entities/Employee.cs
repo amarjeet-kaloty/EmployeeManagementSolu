@@ -20,17 +20,5 @@ namespace EmployeeManagementSolu.Domain.Entities
             Email = email;
             Phone = phone;
         }
-
-        public static Employee Create(string name, string address, string email, string? phone)
-        {
-            Employee employee = new Employee(
-                ObjectId.GenerateNewId().ToString(),
-                name,
-                address,
-                email,
-                phone);
-
-            return employee;
-        }
     }
 }

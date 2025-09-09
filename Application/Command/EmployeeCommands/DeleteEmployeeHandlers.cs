@@ -18,7 +18,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             Employee employee = await _unitOfWork.EmployeeRepository.GetEmployeeByIdAsync(request.Id);
             if (employee == null)
             {
-                return 0;
+                throw new NotFoundException($"Employee with ID {request.Id} not found.");
             }
             await _unitOfWork.EmployeeRepository.DeleteEmployeeAsync(request.Id);
             int affectedRows = await _unitOfWork.SaveChangesAsync(cancellationToken);

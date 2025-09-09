@@ -21,12 +21,10 @@ namespace Application.Query.EmployeeQueries
 
         public async Task<ReadEmployeeDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
         {
-            IQueryable query = _unitOfWork.EmployeeRepository.GetAllAsQueryable()
-                .Where(e => e.Email == request.Email);
-            ReadEmployeeDTO? employeeDto = await query.ProjectTo<ReadEmployeeDTO>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(cancellationToken);
+            var employee = await _unitOfWork.EmployeeRepository.GetEmployeeByEmailAsync(request.Email);
+            var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
 
-            return employeeDto!;
+            return readEmployeeDTO;
         }
     }
 }
