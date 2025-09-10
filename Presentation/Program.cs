@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Mappers;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
@@ -28,7 +29,10 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
 builder.Services.AddScoped<EmployeeValidationService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(new CustomExceptionFilterAttribute());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
