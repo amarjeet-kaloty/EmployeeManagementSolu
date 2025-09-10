@@ -6,7 +6,12 @@ using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Presentation.Controllers;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using MongoDB.Bson;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -81,18 +86,79 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             _mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(new ValidationException("Simulated validation error"));
 
-            // Act
-            var result = await _controller.AddEmployee(employeeDto);
+            var filter = new CustomExceptionFilterAttribute();
 
-            // Assert
+            ActionResult<ReadEmployeeDTO> actionResult = null;
+
+            try
+            {
+                actionResult = await _controller.AddEmployee(employeeDto);
+            }
+            catch (Exception ex)
+            {
+                var httpContext = new DefaultHttpContext();
+                var actionContext = new ActionContext(httpContext, new RouteData(), new ControllerActionDescriptor());
+                var exceptionContext = new ExceptionContext(actionContext, new List<IFilterMetadata>())
+                {
+                    Exception = ex
+                };
+
+                filter.OnException(exceptionContext);
+
+                actionResult = (ActionResult?)exceptionContext.Result!;
+            }
+
+            /// Assert
             await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
              cmd.Name == employeeDto.Name &&
              cmd.Address == employeeDto.Address &&
              cmd.Email == employeeDto.Email &&
              cmd.Phone == employeeDto.Phone));
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult.Result);
             Assert.Equal("Simulated validation error", badRequestResult.Value);
         }
+
+
+            //try
+            //{
+            //    // Act
+            //    var result = await _controller.AddEmployee(employeeDto);
+
+            //}
+            //catch (ValidationException ex)
+            //{
+            //    // Assert
+            //    await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
+            //     cmd.Name == employeeDto.Name &&
+            //     cmd.Address == employeeDto.Address &&
+            //     cmd.Email == employeeDto.Email &&
+            //     cmd.Phone == employeeDto.Phone));
+            //    var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            //    Assert.Equal("Simulated validation error", badRequestResult.Value);
+            //}
+            //// Arrange
+            //CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
+            //{
+            //    Name = "Test Employee 1",
+            //    Address = "123 Praline Ave",
+            //    Email = "employee1@gmail.com",
+            //    Phone = "404-111-1234"
+            //};
+
+            //_mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(new ValidationException("Simulated validation error"));
+
+            //// Act
+            //var result = await _controller.AddEmployee(employeeDto);
+
+            //// Assert
+            //await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
+            // cmd.Name == employeeDto.Name &&
+            // cmd.Address == employeeDto.Address &&
+            // cmd.Email == employeeDto.Email &&
+            // cmd.Phone == employeeDto.Phone));
+            //var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            //Assert.Equal("Simulated validation error", badRequestResult.Value);
+        //}
         #endregion Create Employee
 
         #region Update Employee
