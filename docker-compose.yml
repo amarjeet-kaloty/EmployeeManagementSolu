@@ -1,0 +1,24 @@
+services:
+  employee-api:
+    image: employeemanagementsolu-api:latest
+    container_name: employee-api-container
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__MongoDB=mongodb://mongodb-service:27017/EmployeesCollection
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - mongodb-service
+
+  mongodb-service:
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:    
+  
+  

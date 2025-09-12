@@ -11,4 +11,9 @@ COPY . .
 WORKDIR /src/Presentation
 RUN dotnet publish -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} 
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} as final
+WORKDIR /app
+EXPOSE 8080
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "Presentation.dll"]

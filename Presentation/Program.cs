@@ -17,7 +17,7 @@ builder.Services.AddSingleton(new MongoClient(connectionString));
 builder.Services.AddSingleton(serviceProvider =>
 {
     var client = serviceProvider.GetRequiredService<MongoClient>();
-    return client.GetDatabase("employeesCollection");
+    return client.GetDatabase(MongoUrl.Create(connectionString).DatabaseName);
 });
 builder.Services.AddDbContext<DataContext>(options =>
 {
