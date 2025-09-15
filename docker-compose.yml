@@ -1,14 +1,10 @@
 services:
-  employee-api:
-    image: employeemanagementsolu-api:latest
+  presentation:
+    image: ${DOCKER_REGISTRY-}presentation
     container_name: employee-api-container
-    ports:
-      - "8080:8080"
-    environment:
-      - ConnectionStrings__MongoDB=mongodb://mongodb-service:27017/EmployeesCollection
-      - ASPNETCORE_ENVIRONMENT=Development
-    depends_on:
-      - mongodb-service
+    build:
+      context: .
+      dockerfile: Presentation/Dockerfile
 
   mongodb-service:
     image: mongo:latest
@@ -19,6 +15,4 @@ services:
       - mongo-data:/data/db
 
 volumes:
-  mongo-data:    
-  
-  
+  mongo-data:
