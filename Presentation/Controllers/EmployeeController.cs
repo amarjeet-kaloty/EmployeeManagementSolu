@@ -27,7 +27,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The newly created object, including its assigned ID.
         /// </returns>
-        [HttpPost]
+        [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
@@ -58,7 +58,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The updated object.
         /// </returns>
-        [HttpPut]
+        [HttpPut("Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -144,7 +144,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
-        [HttpGet("ById")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -176,7 +176,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
         /// </returns>
-        [HttpGet("ByEmail")]
+        [HttpGet("{email}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
