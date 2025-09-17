@@ -6,6 +6,7 @@ using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.Filters;
 
 namespace EmployeeManagementSolu.Presentation.Controllers
 {
@@ -176,7 +177,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
         /// </returns>
-        [HttpGet("{email}")]
+        [HttpGet("ByEmail/{email}")]
+        [ValidateEmail]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
