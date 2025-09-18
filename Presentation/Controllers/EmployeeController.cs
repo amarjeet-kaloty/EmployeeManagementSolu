@@ -44,7 +44,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                var simpleMessage = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(new { message = simpleMessage });
             }
             catch (Exception ex)
             {
@@ -77,6 +78,11 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (ValidationException ex)
+            {
+                var simpleMessage = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
+                return BadRequest(new { message = simpleMessage });
             }
             catch (Exception ex)
             {
