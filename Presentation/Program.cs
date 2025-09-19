@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Mappers;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
@@ -28,6 +29,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IValidator<Employee>, EmployeeValidator>();
 builder.Services.AddScoped<EmployeeValidationService>();
+builder.Services.AddScoped<CustomExceptionFilterAttribute>();
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {

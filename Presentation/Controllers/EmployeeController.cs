@@ -12,6 +12,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(CustomExceptionFilterAttribute))]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -33,24 +34,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
-            try
-            {
-                ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
-                return Ok(newEmployeeDto);
-            }
-            catch (AutoMapperMappingException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                var simpleMessage = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { message = simpleMessage });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
+            return Ok(newEmployeeDto);
         }
 
         /// <summary> 
@@ -66,28 +51,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
-            try
-            {
-                ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
-                return Ok(updatedEmployee);
-            }
-            catch (AutoMapperMappingException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ValidationException ex)
-            {
-                var simpleMessage = string.Join(" ", ex.Errors.Select(e => e.ErrorMessage));
-                return BadRequest(new { message = simpleMessage });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
+            return Ok(updatedEmployee);
         }
 
         /// <summary>
@@ -103,19 +68,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> DeleteEmployee(string id)
         {
-            try
-            {
-                int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
-                return Ok(id);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
+            return Ok(id);
         }
 
         /// <summary>
@@ -129,19 +83,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeeList()
         {
-            try
-            {
-                List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
-                return Ok(employeeList);
-            }
-            catch (AutoMapperMappingException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
+            return Ok(employeeList);
         }
 
         /// <summary>
@@ -157,23 +100,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployee(string id)
         {
-            try
-            {
-                ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
-                return Ok(employee);
-            }
-            catch (AutoMapperMappingException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
+            return Ok(employee);
         }
 
         /// <summary>
@@ -190,23 +118,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployeeByEmail(string email)
         {
-            try
-            {
-                ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
-                return Ok(employee);
-            }
-            catch (AutoMapperMappingException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
+            return Ok(employee);
         }
     }
 }

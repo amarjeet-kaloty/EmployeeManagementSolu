@@ -79,19 +79,19 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(new ValidationException("Simulated validation error"));
+            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(
+                new ValidationException("Simulated validation error"));
 
-            // Act
-            var result = await _controller.AddEmployee(employeeDto);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
-             cmd.Name == employeeDto.Name &&
-             cmd.Address == employeeDto.Address &&
-             cmd.Email == employeeDto.Email &&
-             cmd.Phone == employeeDto.Phone));
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal("Simulated validation error", badRequestResult.Value);
+            // Act & Assert
+            await Assert.ThrowsAsync<ValidationException>(async () =>
+            {
+                await _controller.AddEmployee(employeeDto);
+                await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
+                 cmd.Name == employeeDto.Name &&
+                 cmd.Address == employeeDto.Address &&
+                 cmd.Email == employeeDto.Email &&
+                 cmd.Phone == employeeDto.Phone));
+            });
         }
         #endregion Create Employee
 
@@ -153,20 +153,20 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).ThrowsAsync(new Exception("Simulated error"));
+            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).ThrowsAsync(
+                new Exception("Simulated error"));
 
-            // Act
-            var result = await _controller.UpdateEmployee(updateEmployeeDTO);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await _controller.UpdateEmployee(updateEmployeeDTO);
+                await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
                 cmd.Id == updateEmployeeDTO.Id &&
                 cmd.Name == updateEmployeeDTO.Name &&
                 cmd.Address == updateEmployeeDTO.Address &&
                 cmd.Email == updateEmployeeDTO.Email &&
                 cmd.Phone == updateEmployeeDTO.Phone));
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal("Simulated error", badRequestResult.Value);
+            });
         }
         #endregion Update Employee
 
@@ -196,15 +196,14 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             string nonExistentId = ObjectId.GenerateNewId().ToString();
 
-            _mediator.Send(Arg.Any<DeleteEmployeeCommand>()).ThrowsAsync(new NotFoundException($"Employee with ID {nonExistentId} not found."));
+            _mediator.Send(Arg.Any<DeleteEmployeeCommand>()).ThrowsAsync(
+                new NotFoundException($"Employee with ID {nonExistentId} not found."));
 
-            // Act
-            var result = await _controller.DeleteEmployee(nonExistentId);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Is<DeleteEmployeeCommand>(cmd => cmd.Id == nonExistentId));
-            var badRequestResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with ID {nonExistentId} not found.", badRequestResult.Value);
+            // Act & Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            {
+                await _controller.DeleteEmployee(nonExistentId);
+            });
         }
         #endregion Delete Employee
 
@@ -312,15 +311,14 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             string nonExistentId = ObjectId.GenerateNewId().ToString();
 
-            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).ThrowsAsync(new AutoMapperMappingException("Simulated automapping error."));
+            _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).ThrowsAsync(
+                new AutoMapperMappingException("Simulated automapping error."));
 
-            // Act
-            var result = await _controller.GetEmployee(nonExistentId);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
-            Assert.Equal($"Simulated automapping error.", badRequestResult.Value);
+            // Act & Assert
+            await Assert.ThrowsAsync<AutoMapperMappingException>(async () =>
+            {
+                await _controller.GetEmployee(nonExistentId);
+            });
         }
         #endregion GetEmployeeById
 
@@ -361,15 +359,14 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Arrange
             string nonExistentEmail = "emailnotexist@gmail.com";
 
-            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).ThrowsAsync(new NotFoundException($"Employee with email {nonExistentEmail} not found."));
+            _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).ThrowsAsync(
+                new NotFoundException($"Employee with email {nonExistentEmail} not found."));
 
-            // Act
-            var result = await _controller.GetEmployeeByEmail(nonExistentEmail);
-
-            // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"Employee with email {nonExistentEmail} not found.", notFoundResult.Value);
+            // Act & Assert
+            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            {
+                await _controller.GetEmployeeByEmail(nonExistentEmail);
+            });
         }
         #endregion GetEmployeeByEmail
     }
