@@ -1,4 +1,3 @@
-using Application.Exceptions;
 using Application.Mappers;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
@@ -9,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using Presentation.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

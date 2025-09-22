@@ -5,11 +5,18 @@ using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Presentation.Controllers;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using MongoDB.Bson;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Presentation.Filters;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {
@@ -93,6 +100,42 @@ namespace EmployeeManagementSolu.Presentation.Tests
                  cmd.Phone == employeeDto.Phone));
             });
         }
+
+        [Fact]
+        public async Task AddEmployee_ValidationException_ReturnsBadRequests()
+        {
+            // Arrange
+            CreateEmployeeDTO employeeDto = new CreateEmployeeDTO
+            {
+                Name = "Test Employee 1",
+                Address = "123 Praline Ave",
+                Email = "employee1@gmail.com",
+                Phone = "404-111-1234"
+            };
+
+            var validationFailures = new List<ValidationFailure>
+            {
+                new ValidationFailure("Name", "Simulated validation error")
+            };
+
+            _mediator.Send(Arg.Any<CreateEmployeeDTO>()).ThrowsAsync(new ValidationException(validationFailures));
+
+            IActionResult actionResult = null;
+
+            try
+            {
+                await _controller.AddEmployee(employeeDto);
+            }
+            catch (Exception ex)
+            {
+                actionResult = HandleExceptionWithFilter(ex);
+            }
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
+            var jsonObject = JObject.FromObject(badRequestResult.Value!);
+            Assert.Equal("Simulated validation error", jsonObject["message"]!.ToString());
+        }
         #endregion Create Employee
 
         #region Update Employee
@@ -153,21 +196,25 @@ namespace EmployeeManagementSolu.Presentation.Tests
                 Phone = "404-111-1234"
             };
 
-            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).ThrowsAsync(
-                new Exception("Simulated error"));
+            _mediator.Send(Arg.Any<UpdateEmployeeDTO>()).ThrowsAsync(new Exception("Simulated general error"));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<Exception>(async () =>
+            IActionResult actionResult = null;
+
+            try
             {
                 await _controller.UpdateEmployee(updateEmployeeDTO);
-                await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
-                cmd.Id == updateEmployeeDTO.Id &&
-                cmd.Name == updateEmployeeDTO.Name &&
-                cmd.Address == updateEmployeeDTO.Address &&
-                cmd.Email == updateEmployeeDTO.Email &&
-                cmd.Phone == updateEmployeeDTO.Phone));
-            });
+            }
+            catch (Exception ex)
+            {
+                actionResult = HandleExceptionWithFilter(ex);
+            }
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
+            var jsonObject = JObject.FromObject(badRequestResult.Value!);
+            Assert.Equal("Simulated general error", jsonObject["message"]!.ToString());
         }
+
         #endregion Update Employee
 
         #region Delete Employee
@@ -199,11 +246,21 @@ namespace EmployeeManagementSolu.Presentation.Tests
             _mediator.Send(Arg.Any<DeleteEmployeeCommand>()).ThrowsAsync(
                 new NotFoundException($"Employee with ID {nonExistentId} not found."));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            IActionResult actionResult = null;
+
+            try
             {
                 await _controller.DeleteEmployee(nonExistentId);
-            });
+            }
+            catch (Exception ex)
+            {
+                actionResult = HandleExceptionWithFilter(ex);
+            }
+
+            // Assert
+            var notFoundRequestResult = Assert.IsType<NotFoundObjectResult>(actionResult);
+            var jsonObject = JObject.FromObject(notFoundRequestResult.Value!);
+            Assert.Equal($"Employee with ID {nonExistentId} not found.", jsonObject["message"]!.ToString());
         }
         #endregion Delete Employee
 
@@ -312,13 +369,23 @@ namespace EmployeeManagementSolu.Presentation.Tests
             string nonExistentId = ObjectId.GenerateNewId().ToString();
 
             _mediator.Send(Arg.Any<GetEmployeeByIdQuery>()).ThrowsAsync(
-                new AutoMapperMappingException("Simulated automapping error."));
+               new AutoMapperMappingException("Simulated automapping error."));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<AutoMapperMappingException>(async () =>
+            IActionResult actionResult = null;
+
+            try
             {
                 await _controller.GetEmployee(nonExistentId);
-            });
+            }
+            catch (Exception ex)
+            {
+                actionResult = HandleExceptionWithFilter(ex);
+            }
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
+            var jsonObject = JObject.FromObject(badRequestResult.Value!);
+            Assert.Equal("Simulated automapping error.", jsonObject["message"]!.ToString());
         }
         #endregion GetEmployeeById
 
@@ -360,14 +427,42 @@ namespace EmployeeManagementSolu.Presentation.Tests
             string nonExistentEmail = "emailnotexist@gmail.com";
 
             _mediator.Send(Arg.Any<GetEmployeeByEmailQuery>()).ThrowsAsync(
-                new NotFoundException($"Employee with email {nonExistentEmail} not found."));
+               new NotFoundException($"Employee with email {nonExistentEmail} not found."));
 
-            // Act & Assert
-            await Assert.ThrowsAsync<NotFoundException>(async () =>
+            IActionResult actionResult = null;
+
+            try
             {
                 await _controller.GetEmployeeByEmail(nonExistentEmail);
-            });
+            }
+            catch (Exception ex)
+            {
+                actionResult = HandleExceptionWithFilter(ex);
+            }
+
+            // Assert
+            var notFoundRequestResult = Assert.IsType<NotFoundObjectResult>(actionResult);
+            var jsonObject = JObject.FromObject(notFoundRequestResult.Value!);
+            Assert.Equal($"Employee with email {nonExistentEmail} not found.", jsonObject["message"]!.ToString());
         }
         #endregion GetEmployeeByEmail
+
+        #region Helper Methods
+        private IActionResult HandleExceptionWithFilter(Exception ex)
+        {
+            var filter = new CustomExceptionFilterAttribute();
+            var httpContext = new DefaultHttpContext();
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ControllerActionDescriptor());
+            var exceptionContext = new ExceptionContext(actionContext, new List<IFilterMetadata>())
+            { 
+                Exception = ex
+            };
+
+            filter.OnException(exceptionContext);
+
+            return exceptionContext.Result!;
+        }
+
+        #endregion
     }
 }
