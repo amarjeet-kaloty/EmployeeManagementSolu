@@ -13,7 +13,7 @@ namespace Application.Exceptions
             {
                 case AutoMapperMappingException ex:
                     context.Result = new BadRequestObjectResult(
-                        new { message = "An error occurred while processing the request due to a data mapping issue." });
+                        new { message = ex.Message });
                     break;
 
                 case ValidationException ex:
@@ -22,7 +22,7 @@ namespace Application.Exceptions
                     break;
 
                 case NotFoundException ex:
-                    context.Result = new BadRequestObjectResult(
+                    context.Result = new NotFoundObjectResult(
                         new { message = ex.Message });
                     break;
 
