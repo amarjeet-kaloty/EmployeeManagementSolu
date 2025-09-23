@@ -246,8 +246,8 @@ namespace EmployeeManagementSolu.Presentation.Tests
             // Assert
             await _mediator.Received(1).Send(Arg.Is<DeleteEmployeeCommand>(cmd => cmd.Id == employeeIdToDelete));
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var actualDeletedId = Assert.IsType<string>(okResult.Value);
-            Assert.Equal(employeeIdToDelete, actualDeletedId);
+            var employeeDeletedCount = Assert.IsType<int>(okResult.Value);
+            Assert.Equal(1, employeeDeletedCount);
             Assert.Equal(200, okResult.StatusCode);
         }
 

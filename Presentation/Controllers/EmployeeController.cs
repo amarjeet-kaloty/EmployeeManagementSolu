@@ -69,7 +69,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<int>> DeleteEmployee(string id)
         {
             int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
-            return Ok(id);
+            return Ok(employeeDeletedCount);
         }
 
         /// <summary>
