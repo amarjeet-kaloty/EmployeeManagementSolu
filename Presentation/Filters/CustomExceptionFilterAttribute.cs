@@ -1,9 +1,10 @@
-﻿using AutoMapper;
+﻿using Application.Exceptions;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Application.Exceptions
+namespace Presentation.Filters
 {
     public class CustomExceptionFilterAttribute : ExceptionFilterAttribute
     {
