@@ -9,8 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Presentation.Filters;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .WriteTo.Console()
+    .WriteTo.File(builder.Configuration["Serilog:LogFilePath"]!, rollingInterval: RollingInterval.Day)
+);
 
 // Add services to the container.
 builder.Services.AddMediatR(typeof(EmployeeManagementSolu.Application.Command.EmployeeCommands.CreateEmployeeCommand).Assembly);
