@@ -3,6 +3,7 @@ using AutoMapper;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
+using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Presentation.Controllers;
 using FluentValidation;
 using FluentValidation.Results;
@@ -124,6 +125,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             try
             {
+                // Act
                 await _controller.AddEmployee(employeeDto);
             }
             catch (Exception ex)
@@ -132,6 +134,11 @@ namespace EmployeeManagementSolu.Presentation.Tests
             }
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<CreateEmployeeDTO>(cmd =>
+                 cmd.Name == employeeDto.Name &&
+                 cmd.Address == employeeDto.Address &&
+                 cmd.Email == employeeDto.Email &&
+                 cmd.Phone == employeeDto.Phone));
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
             var jsonObject = JObject.FromObject(badRequestResult.Value!);
             Assert.Equal("Simulated validation error", jsonObject["message"]!.ToString());
@@ -202,6 +209,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             try
             {
+                // Act
                 await _controller.UpdateEmployee(updateEmployeeDTO);
             }
             catch (Exception ex)
@@ -210,6 +218,12 @@ namespace EmployeeManagementSolu.Presentation.Tests
             }
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<UpdateEmployeeDTO>(cmd =>
+               cmd.Id == updateEmployeeDTO.Id &&
+               cmd.Name == updateEmployeeDTO.Name &&
+               cmd.Address == updateEmployeeDTO.Address &&
+               cmd.Email == updateEmployeeDTO.Email &&
+               cmd.Phone == updateEmployeeDTO.Phone));
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
             var jsonObject = JObject.FromObject(badRequestResult.Value!);
             Assert.Equal("Simulated general error", jsonObject["message"]!.ToString());
@@ -250,6 +264,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             try
             {
+                // Act
                 await _controller.DeleteEmployee(nonExistentId);
             }
             catch (Exception ex)
@@ -258,6 +273,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             }
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<DeleteEmployeeCommand>(cmd => cmd.Id == nonExistentId));
             var notFoundRequestResult = Assert.IsType<NotFoundObjectResult>(actionResult);
             var jsonObject = JObject.FromObject(notFoundRequestResult.Value!);
             Assert.Equal($"Employee with ID {nonExistentId} not found.", jsonObject["message"]!.ToString());
@@ -352,7 +368,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var result = await _controller.GetEmployee(employeeID);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByIdQuery>());
+            await _mediator.Received(1).Send(Arg.Is<GetEmployeeByIdQuery>(emp => emp.Id == employeeID));
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             ReadEmployeeDTO actualEmployee = Assert.IsType<ReadEmployeeDTO>(okResult.Value);
             Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
@@ -375,6 +391,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             try
             {
+                // Act
                 await _controller.GetEmployee(nonExistentId);
             }
             catch (Exception ex)
@@ -383,6 +400,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             }
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<GetEmployeeByIdQuery>(emp => emp.Id == nonExistentId));
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(actionResult);
             var jsonObject = JObject.FromObject(badRequestResult.Value!);
             Assert.Equal("Simulated automapping error.", jsonObject["message"]!.ToString());
@@ -410,7 +428,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             var result = await _controller.GetEmployeeByEmail(expectedEmployee.Email);
 
             // Assert
-            await _mediator.Received(1).Send(Arg.Any<GetEmployeeByEmailQuery>());
+            await _mediator.Received(1).Send(Arg.Is<GetEmployeeByEmailQuery>(emp => emp.Email == expectedEmployee.Email));
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             ReadEmployeeDTO actualEmployee = Assert.IsType<ReadEmployeeDTO>(okResult.Value);
             Assert.Equal(expectedEmployee.Id, actualEmployee.Id);
@@ -433,6 +451,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
 
             try
             {
+                // Act
                 await _controller.GetEmployeeByEmail(nonExistentEmail);
             }
             catch (Exception ex)
@@ -441,6 +460,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             }
 
             // Assert
+            await _mediator.Received(1).Send(Arg.Is<GetEmployeeByEmailQuery>(emp => emp.Email == nonExistentEmail));
             var notFoundRequestResult = Assert.IsType<NotFoundObjectResult>(actionResult);
             var jsonObject = JObject.FromObject(notFoundRequestResult.Value!);
             Assert.Equal($"Employee with email {nonExistentEmail} not found.", jsonObject["message"]!.ToString());
