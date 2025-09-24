@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Presentation.Filters;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,14 @@ builder.Services.AddSingleton(serviceProvider =>
 {
     var client = serviceProvider.GetRequiredService<MongoClient>();
     return client.GetDatabase(MongoUrl.Create(connectionString).DatabaseName);
+});
+builder.Services.AddSingleton(sp =>
+{
+    var connectionFactory = new ConnectionFactory
+    {
+        HostName = "localhost"
+    };
+    return connectionFactory;
 });
 builder.Services.AddDbContext<DataContext>(options =>
 {
