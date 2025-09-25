@@ -20,8 +20,8 @@ namespace Application.Messaging
             //using var connection = await factory.CreateConnectionAsync();
             //using var channel = await connection.CreateChannelAsync();
 
-            using var connection = await _connectionFactory.CreateConnectionAsync();
-            using var channel = await connection.CreateChannelAsync();
+            var connection = await _connectionFactory.CreateConnectionAsync();
+            var channel = await connection.CreateChannelAsync();
 
             // For Reference. Remove it later.
             //await channel.QueueDeclareAsync(queue: "hello", durable: false, exclusive: false, autoDelete: false,
@@ -33,8 +33,18 @@ namespace Application.Messaging
             //const string message = "Hello World!";
             //var body = Encoding.UTF8.GetBytes(message);
 
-            var employeeBodyData = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(employeeData));
+            var message = JsonSerializer.Serialize(employeeData);
+            var body = Encoding.UTF8.GetBytes(message);
 
+            // Reference code
+            // await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "hello", body: body);
+            // Console.WriteLine($" [x] Sent {message}");
+
+            await channel.BasicPublishAsync(
+                exchange: "employee_events",
+                routingKey: "",
+                body: body);
+            Console.WriteLine($" [x] Sent {message}");
         }
     }
 }

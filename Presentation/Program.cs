@@ -22,14 +22,19 @@ builder.Services.AddSingleton(serviceProvider =>
     var client = serviceProvider.GetRequiredService<MongoClient>();
     return client.GetDatabase(MongoUrl.Create(connectionString).DatabaseName);
 });
-builder.Services.AddSingleton(sp =>
-{
-    var connectionFactory = new ConnectionFactory
-    {
-        HostName = "localhost"
-    };
-    return connectionFactory;
-});
+builder.Services.AddSingleton<ConnectionFactory>();
+
+// 2. Register the IConnectionFactory interface with the concrete class
+builder.Services.AddSingleton<IConnectionFactory>(sp =>
+    sp.GetRequiredService<ConnectionFactory>());
+
+// 3. Register the MessagePublisher
+// It depends on the concrete ConnectionFactory, which is now registered.
+builder.Services.AddSingleton<Application.Messaging.MessagePublisher>();
+
+// 4. Register the Hosted Service
+// It depends on IConnectionFactory, which is now correctly registered.
+builder.Services.AddHostedService<Application.Messaging.EmployeeCreatedConsumer>();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     var database = builder.Services.BuildServiceProvider().GetRequiredService<IMongoDatabase>();

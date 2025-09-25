@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Messaging;
+using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Events;
@@ -14,13 +15,20 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly EmployeeValidationService _validationService;
+        private readonly MessagePublisher _messagePublisher;
 
-        public CreateEmployeeHandlers(IUnitOfWork unitOfWork, IMediator mediator, IMapper mapper, EmployeeValidationService validationService)
+        public CreateEmployeeHandlers(
+            IUnitOfWork unitOfWork,
+            IMediator mediator,
+            IMapper mapper,
+            EmployeeValidationService validationService,
+            MessagePublisher messagePublisher)
         {
             _unitOfWork = unitOfWork;
             _mediator = mediator;
             _mapper = mapper;
             _validationService = validationService;
+            _messagePublisher = messagePublisher;
         }
 
         public async Task<ReadEmployeeDTO> Handle(CreateEmployeeDTO request, CancellationToken cancellationToken)
@@ -30,6 +38,7 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
+            await _messagePublisher.PublishEmployeeCreatedEvent(new { employee.Id, employee.Name, employee.Email });
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
             return readEmployeeDTO;
