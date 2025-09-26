@@ -24,16 +24,18 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 builder.Services.AddSingleton<ConnectionFactory>();
 
-// 2. Register the IConnectionFactory interface with the concrete class
 builder.Services.AddSingleton<IConnectionFactory>(sp =>
-    sp.GetRequiredService<ConnectionFactory>());
-
-// 3. Register the MessagePublisher
-// It depends on the concrete ConnectionFactory, which is now registered.
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    return new ConnectionFactory()
+    {
+        HostName = configuration["RabbitMQ:HostName"],
+        Port = configuration.GetValue<int>("RabbitMQ:Port"),
+        UserName = configuration["RabbitMQ:Username"],
+        Password = configuration["RabbitMQ:Password"]
+    };
+});
 builder.Services.AddSingleton<Application.Messaging.MessagePublisher>();
-
-// 4. Register the Hosted Service
-// It depends on IConnectionFactory, which is now correctly registered.
 builder.Services.AddHostedService<Application.Messaging.EmployeeCreatedConsumer>();
 builder.Services.AddDbContext<DataContext>(options =>
 {

@@ -38,7 +38,8 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
             await _unitOfWork.EmployeeRepository.AddEmployeeAsync(employee);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             var readEmployeeDTO = _mapper.Map<ReadEmployeeDTO>(employee);
-            await _messagePublisher.PublishEmployeeCreatedEvent(new { employee.Id, employee.Name, employee.Email });
+            await _messagePublisher.PublishEmployeeCreatedEvent(
+                new { employee.Id, employee.Name, employee.Address, employee.Email, employee.Phone });
             await _mediator.Publish(new EmployeeCreatedEvent(employee), cancellationToken);
 
             return readEmployeeDTO;

@@ -14,5 +14,12 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  rabbitmq: 
+    image: rabbitmq:management
+    container_name: rabbitmq_container
+    ports:
+      - "15672:15672"
+
 volumes:
   mongo-data:
+    
