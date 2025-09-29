@@ -4,8 +4,9 @@ services:
       - ConnectionStrings__MongoDB=mongodb://mongodb-service:27017/EmployeesCollection
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
     ports:
       - "5000:8080"
     volumes:
