@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: Presentation/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   mongodb-service:
     image: mongo:latest
@@ -19,6 +22,13 @@ services:
     container_name: rabbitmq_container
     ports:
       - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+      start_period: 20s
 
 volumes:
   mongo-data:
