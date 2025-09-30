@@ -21,6 +21,11 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Containerization", "Containerization", "{BB0995F4-B1AB-46A2-A15D-712A77261C66}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapr", "Dapr", "{26426598-A554-4248-B93A-8E23AFBF5688}"
+	ProjectSection(SolutionItems) = preProject
+		rabbitmq-pubsub.yaml = rabbitmq-pubsub.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -1,9 +1,6 @@
-﻿using Application.Exceptions;
-using AutoMapper;
-using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;

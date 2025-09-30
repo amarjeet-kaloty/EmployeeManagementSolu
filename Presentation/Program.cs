@@ -61,6 +61,7 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile(new EmployeeProfile());
 });
+builder.Services.AddControllers().AddDapr();
 
 var app = builder.Build();
 
