@@ -29,7 +29,6 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
     var configuration = sp.GetRequiredService<IConfiguration>();
     return new ConnectionFactory()
     {
-        HostName = configuration["RabbitMQ:HostName"],
         Port = configuration.GetValue<int>("RabbitMQ:Port"),
         UserName = configuration["RabbitMQ:Username"],
         Password = configuration["RabbitMQ:Password"]
