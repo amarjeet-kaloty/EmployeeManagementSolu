@@ -1,36 +1,26 @@
-﻿using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
-using System.Text;
-using System.Text.Json;
+﻿using Dapr.Client;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Messaging
 {
     public class MessagePublisher
     {
-        private readonly IConnectionFactory _connectionFactory;
-        private readonly ILogger<EmployeeCreatedConsumer> _logger;
+        private readonly DaprClient _daprClient;
+        private readonly ILogger<MessagePublisher> _logger;
+        private const string PUB_SUB_COMPONENT = "rabbitmq-pubsub";
+        private const string TOPIC_NAME = "employee_events";
 
-        public MessagePublisher(ILogger<EmployeeCreatedConsumer> logger, IConnectionFactory connectionFactory)
+        public MessagePublisher(ILogger<MessagePublisher> logger, DaprClient daprClient)
         {
             _logger = logger;
-            _connectionFactory = connectionFactory;
+            _daprClient = daprClient;
         }
 
         public async Task PublishEmployeeCreatedEvent(object employeeData)
         {
-            var connection = await _connectionFactory.CreateConnectionAsync();
-            var channel = await connection.CreateChannelAsync();
+            await _daprClient.PublishEventAsync(PUB_SUB_COMPONENT, TOPIC_NAME, employeeData);
 
-            await channel.ExchangeDeclareAsync(exchange: "employee_events", type: ExchangeType.Fanout);
-
-            var message = JsonSerializer.Serialize(employeeData);
-            var body = Encoding.UTF8.GetBytes(message);
-
-            await channel.BasicPublishAsync(
-                exchange: "employee_events",
-                routingKey: "",
-                body: body);
-            _logger.LogInformation($" [=>] Sent {message}");
+            _logger.LogInformation($" [=>] Sent employee create event to Dapr pub-sub component: {PUB_SUB_COMPONENT}/{TOPIC_NAME}");
         }
     }
 }

@@ -6,5 +6,5 @@ spec:
   type: pubsub.rabbitmq
   version: v1
   metadata:
-    name: host
+  - name: host
     value: "amqp://localhost:5672"
