@@ -9,6 +9,22 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  presentation-dapr:
+    image: "daprio/dapr:1.16.0"
+    container_name: dapr_container
+    network_mode: service:presentation
+    command: [
+      "/daprd",
+      "-app-id", "employeeservice",
+      "-app-port", "8080",
+      "-resources-path", "/app"
+    ]
+    volumes:
+      - ./rabbitmq-pubsub.yaml:/app/rabbitmq-pubsub.yaml
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
   mongodb-service:
     image: mongo:latest
     container_name: mongodb_container

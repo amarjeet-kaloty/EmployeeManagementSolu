@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Presentation.Controllers
 {
     [ApiController]
-    [Route("/api/v1/employees/events/EmployeeCreated")]
+    [Route("api/subscriptions/employee")]
     public class EmployeeSubscriptionController : Controller
     {
         private readonly ILogger<EmployeeSubscriptionController> _logger;
@@ -16,11 +16,11 @@ namespace Presentation.Controllers
         }
 
         [Topic("rabbitmq-pubsub", "employee_events")]
-        [HttpPost]
-        public ActionResult HandleEmployeeCreatedEvent([FromBody] CreateEmployeeDTO employeeData)
+        [HttpPost("EmployeeCreated")]
+        public ActionResult HandleEmployeeCreatedEvent([FromBody] ReadEmployeeDTO employeeData)
         {
             _logger.LogInformation($" [=>] Dapr Received Employee Created Event for Employee:" +
-                $" {employeeData.Name}, {employeeData.Address}, {employeeData.Email}, {employeeData.Phone}");
+                $" {employeeData.Id}, {employeeData.Name}, {employeeData.Address}, {employeeData.Email}, {employeeData.Phone}");
 
             return Ok($"Event successfully handled for employee creation.");
         }
