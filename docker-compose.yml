@@ -38,6 +38,9 @@ services:
     build:
       context: ../EmployeeNotifierSolu
       dockerfile: EmployeeNotifier/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   employeenotifier-dapr:
     image: "daprio/dapr:1.16.0"
