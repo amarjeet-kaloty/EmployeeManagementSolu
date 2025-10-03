@@ -35,7 +35,6 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
     };
 });
 builder.Services.AddSingleton<Application.Messaging.MessagePublisher>();
-builder.Services.AddHostedService<Application.Messaging.EmployeeCreatedConsumer>();
 builder.Services.AddDbContext<DataContext>(options =>
 {
     var database = builder.Services.BuildServiceProvider().GetRequiredService<IMongoDatabase>();
@@ -60,6 +59,7 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile(new EmployeeProfile());
 });
+builder.Services.AddControllers().AddDapr();
 
 var app = builder.Build();
 
@@ -72,7 +72,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCloudEvents();
+
 app.UseAuthorization();
+
+app.MapSubscribeHandler();
 
 app.MapControllers();
 
