@@ -72,11 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCloudEvents();
-
 app.UseAuthorization();
-
-app.MapSubscribeHandler();
 
 app.MapControllers();
 
