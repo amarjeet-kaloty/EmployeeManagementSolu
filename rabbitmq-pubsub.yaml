@@ -8,3 +8,9 @@ spec:
   metadata:
   - name: host
     value: "amqp://guest:guest@rabbitmq:5672" # value: "amqp://localhost:5672" # value: "amqp://rabbitmq_container:5672"
+  - name: backOff.initialTimeoutInSeconds
+    value: "60"
+  - name: backOff.policy
+    value: "constant"
+  - name: backOff.duration
+    value: "3s"

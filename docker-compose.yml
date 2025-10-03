@@ -61,7 +61,7 @@ services:
         condition: service_started
 
   # -----------------------------------------------------------------
-  #  INFRASTRUCTURE SERVICES
+  #  SERVICES
   # -----------------------------------------------------------------
   mongodb-service:
     image: mongo:latest
