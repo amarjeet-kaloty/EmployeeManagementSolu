@@ -1,7 +1,6 @@
 ﻿using Dapr.Client;
-using Microsoft.Extensions.Logging;
 
-namespace Application.Messaging
+namespace Presentation.Messaging
 {
     public class MessagePublisher
     {
@@ -21,6 +20,13 @@ namespace Application.Messaging
             await _daprClient.PublishEventAsync(PUB_SUB_COMPONENT, TOPIC_NAME, employeeData);
 
             _logger.LogInformation($" [=>] Sent employee create event to Dapr pub-sub component: {PUB_SUB_COMPONENT}/{TOPIC_NAME}");
+        }
+
+        public async Task PublishEmployeeUpdatedEvent(object employeeData)
+        {
+            await _daprClient.PublishEventAsync(PUB_SUB_COMPONENT, "employee-updated-topic", employeeData);
+
+            _logger.LogInformation($" [=>] Sent employee update event to Dapr pub-sub component...");
         }
     }
 }

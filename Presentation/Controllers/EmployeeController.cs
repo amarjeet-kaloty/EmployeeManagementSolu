@@ -1,9 +1,11 @@
 ﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
+using EmployeeManagementSolu.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
+using Presentation.Messaging;
 
 namespace EmployeeManagementSolu.Presentation.Controllers
 {
@@ -13,10 +15,12 @@ namespace EmployeeManagementSolu.Presentation.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly MessagePublisher _messagePublisher;
 
-        public EmployeeController(IMediator mediator)
+        public EmployeeController(IMediator mediator, MessagePublisher messagePublisher)
         {
             _mediator = mediator;
+            _messagePublisher = messagePublisher;
         }
 
         /// <summary>
@@ -32,6 +36,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
+            await _messagePublisher.PublishEmployeeCreatedEvent(
+               new { newEmployeeDto.Id, newEmployeeDto.Name, newEmployeeDto.Address, newEmployeeDto.Email, newEmployeeDto.Phone });
             return Ok(newEmployeeDto);
         }
 
@@ -49,6 +55,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
+            await _messagePublisher.PublishEmployeeUpdatedEvent(
+                new { updatedEmployee.Id, updatedEmployee.Name, updatedEmployee.Address, updatedEmployee.Email, updatedEmployee.Phone });
             return Ok(updatedEmployee);
         }
 

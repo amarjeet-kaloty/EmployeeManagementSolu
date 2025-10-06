@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Presentation.Filters;
+using Presentation.Messaging;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +35,9 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
         Password = configuration["RabbitMQ:Password"]
     };
 });
-builder.Services.AddSingleton<Application.Messaging.MessagePublisher>();
+
+builder.Services.AddScoped<Presentation.Messaging.MessagePublisher>();
+
 builder.Services.AddDbContext<DataContext>(options =>
 {
     var database = builder.Services.BuildServiceProvider().GetRequiredService<IMongoDatabase>();
