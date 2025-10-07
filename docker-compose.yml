@@ -9,9 +9,6 @@ services:
     build:
       context: .
       dockerfile: Presentation/Dockerfile
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
 
   presentation-dapr:
     image: "daprio/dapr:1.16.0"
@@ -25,53 +22,6 @@ services:
     ]
     volumes:
       - ./rabbitmq-pubsub.yaml:/app/rabbitmq-pubsub.yaml
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  # -----------------------------------------------------------------
-  #  EMPLOYEE-CREATE-SUBSCRIBER (EmployeeNotifierSolu)
-  # -----------------------------------------------------------------
-  employeenotifier:
-    image: ${DOCKER_REGISTRY-}employeenotifier
-    container_name: employee-notifier-container
-    build:
-      context: ../EmployeeNotifierSolu
-      dockerfile: EmployeeNotifier/Dockerfile
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
-  employeenotifier-dapr:
-    image: "daprio/dapr:1.16.0"
-    container_name: dapr_subscriber_sidecar
-    network_mode: service:employeenotifier
-    command: [
-      "/daprd",
-      "-app-id", "notifierservice",
-      "-app-port", "8080",
-      "-resources-path", "/app"
-    ]
-    volumes:
-      - ./rabbitmq-pubsub.yaml:/app/rabbitmq-pubsub.yaml
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      employeenotifier:
-        condition: service_started
-
-  # -----------------------------------------------------------------
-  #  EMPLOYEE-UPDATE-SUBSCRIBER (EmployeeUpdateSubscriber)
-  # -----------------------------------------------------------------
-  employeeupdatesubscriber:
-    image: ${DOCKER_REGISTRY-}employeeupdatesubscriber
-    container_name: employee-update-subscriber-container
-    build:
-      context: ../EmployeeUpdateSubscriberSolu
-      dockerfile: EmployeeUpdateSubscriber/Dockerfile
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
 
   # -----------------------------------------------------------------
   #  SERVICES
@@ -83,19 +33,6 @@ services:
       - "3000:27017"
     volumes:
       - mongo-data:/data/db
-
-  rabbitmq: 
-    image: rabbitmq:management
-    container_name: rabbitmq_container
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 5s
-      timeout: 15s
-      retries: 5
-      start_period: 20s
 
 volumes:
   mongo-data:
