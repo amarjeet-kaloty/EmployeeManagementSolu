@@ -7,10 +7,8 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Presentation.Filters;
-using Presentation.Messaging;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,19 +23,6 @@ builder.Services.AddSingleton(serviceProvider =>
     return client.GetDatabase(MongoUrl.Create(connectionString).DatabaseName);
 });
 builder.Services.AddSingleton<ConnectionFactory>();
-
-builder.Services.AddSingleton<IConnectionFactory>(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-
-    return new ConnectionFactory()
-    {
-        HostName = configuration["RabbitMQ:HostName"],
-        Port = configuration.GetValue<int>("RabbitMQ:Port"),
-        UserName = configuration["RabbitMQ:UserName"],
-        Password = configuration["RabbitMQ:Password"]
-    };
-});
 
 builder.Services.AddScoped<Presentation.Messaging.MessagePublisher>();
 

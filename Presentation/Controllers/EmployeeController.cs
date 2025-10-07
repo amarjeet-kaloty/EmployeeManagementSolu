@@ -55,8 +55,6 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
-            await _messagePublisher.PublishEmployeeUpdatedEvent(
-                new { updatedEmployee.Id, updatedEmployee.Name, updatedEmployee.Address, updatedEmployee.Email, updatedEmployee.Phone });
             return Ok(updatedEmployee);
         }
 

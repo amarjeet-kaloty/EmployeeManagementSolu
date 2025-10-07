@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: Presentation/Dockerfile
+    networks:
+      - dapr-network
 
   presentation-dapr:
     image: "daprio/dapr:1.16.0"
@@ -33,7 +35,14 @@ services:
       - "3000:27017"
     volumes:
       - mongo-data:/data/db
+    networks:
+      - dapr-network
 
 volumes:
   mongo-data:
+
+networks:
+  dapr-network:
+    external: true
+    name: dapr-pubsub-network
     

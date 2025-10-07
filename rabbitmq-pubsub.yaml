@@ -6,11 +6,5 @@ spec:
   type: pubsub.rabbitmq
   version: v1
   metadata:
-  - name: connectionString
-    value: "amqp://rabbitmq:5672" # value: "amqp://localhost:5672" # value: "amqp://rabbitmq_container:5672"
-  - name: backOff.initialTimeoutInSeconds
-    value: "60"
-  - name: backOff.policy
-    value: "constant"
-  - name: backOff.duration
-    value: "3s"
+  - name: host
+    value: "amqp://rabbitmq:5672" # value: "amqp://localhost:5672" # value: "amqp://rabbitmq_container:5672" && "amqp://host.docker.internal:5672"
