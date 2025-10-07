@@ -1,7 +1,4 @@
 ﻿using Dapr.Client;
-using RabbitMQ.Client;
-using System.Text;
-using System.Text.Json;
 
 namespace Presentation.Messaging
 {

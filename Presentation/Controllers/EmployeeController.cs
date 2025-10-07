@@ -1,7 +1,6 @@
 ﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
-using EmployeeManagementSolu.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;

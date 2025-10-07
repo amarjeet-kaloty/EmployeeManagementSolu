@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Domain.Entities;
-using EmployeeManagementSolu.Domain.Events;
 using EmployeeManagementSolu.Domain.Interfaces;
 using EmployeeManagementSolu.Domain.Validation;
 using MediatR;
