@@ -10,18 +10,15 @@ namespace EmployeeManagementSolu.Application.Command.EmployeeCommands
     public class CreateEmployeeHandlers : IRequestHandler<CreateEmployeeDTO, ReadEmployeeDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly EmployeeValidationService _validationService;
 
         public CreateEmployeeHandlers(
             IUnitOfWork unitOfWork,
-            IMediator mediator,
             IMapper mapper,
             EmployeeValidationService validationService)
         {
             _unitOfWork = unitOfWork;
-            _mediator = mediator;
             _mapper = mapper;
             _validationService = validationService;
         }
