@@ -7,6 +7,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using Presentation.Filters;
 using Presentation.Messaging;
@@ -28,10 +29,12 @@ builder.Services.AddSingleton<ConnectionFactory>();
 builder.Services.AddSingleton<IConnectionFactory>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
+
     return new ConnectionFactory()
     {
+        HostName = configuration["RabbitMQ:HostName"],
         Port = configuration.GetValue<int>("RabbitMQ:Port"),
-        UserName = configuration["RabbitMQ:Username"],
+        UserName = configuration["RabbitMQ:UserName"],
         Password = configuration["RabbitMQ:Password"]
     };
 });

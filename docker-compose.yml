@@ -30,7 +30,7 @@ services:
         condition: service_healthy
 
   # -----------------------------------------------------------------
-  #  SUBSCRIBER SERVICES (EmployeeNotifierSolu)
+  #  EMPLOYEE-CREATE-SUBSCRIBER (EmployeeNotifierSolu)
   # -----------------------------------------------------------------
   employeenotifier:
     image: ${DOCKER_REGISTRY-}employeenotifier
@@ -59,6 +59,19 @@ services:
         condition: service_healthy
       employeenotifier:
         condition: service_started
+
+  # -----------------------------------------------------------------
+  #  EMPLOYEE-UPDATE-SUBSCRIBER (EmployeeUpdateSubscriber)
+  # -----------------------------------------------------------------
+  employeeupdatesubscriber:
+    image: ${DOCKER_REGISTRY-}employeeupdatesubscriber
+    container_name: employee-update-subscriber-container
+    build:
+      context: ../EmployeeUpdateSubscriberSolu
+      dockerfile: EmployeeUpdateSubscriber/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   # -----------------------------------------------------------------
   #  SERVICES
