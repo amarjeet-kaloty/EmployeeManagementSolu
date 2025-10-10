@@ -1,4 +1,5 @@
 ﻿using Dapr.Client;
+using System.Text.Json;
 
 namespace Presentation.Messaging
 {
@@ -18,8 +19,8 @@ namespace Presentation.Messaging
         public async Task PublishEmployeeCreatedEvent(object employeeData)
         {
             await _daprClient.PublishEventAsync(PUB_SUB_COMPONENT, TOPIC_NAME, employeeData);
-
-            _logger.LogInformation($" [=>] Sent employee create event to Dapr pub-sub component: {PUB_SUB_COMPONENT}/{TOPIC_NAME}");
+            string employeeDataJson = JsonSerializer.Serialize(employeeData);
+            _logger.LogInformation($" [=>] Sent employee create event to Dapr pub-sub component: {employeeDataJson}");
         }
     }
 }
