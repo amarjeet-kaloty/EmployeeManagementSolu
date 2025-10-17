@@ -18,6 +18,9 @@ using Newtonsoft.Json.Linq;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Presentation.Filters;
+using Presentation.Messaging;
+using Dapr.Client;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {
@@ -25,11 +28,17 @@ namespace EmployeeManagementSolu.Presentation.Tests
     {
         private readonly IMediator _mediator;
         private readonly EmployeeController _controller;
+        private readonly MessagePublisher _messagePublisher;
+        private readonly ILogger<MessagePublisher> _logger;
+        private readonly DaprClient _daprClient;
 
         public EmployeeControllerTests()
         {
             _mediator = Substitute.For<IMediator>();
-            _controller = new EmployeeController(_mediator);
+            _logger = Substitute.For<ILogger<MessagePublisher>>();
+            _daprClient = Substitute.For<DaprClient>();
+            _messagePublisher = Substitute.For<MessagePublisher>(_logger, _daprClient);
+            _controller = new EmployeeController(_mediator, _messagePublisher);
         }
 
         #region Create Employee
