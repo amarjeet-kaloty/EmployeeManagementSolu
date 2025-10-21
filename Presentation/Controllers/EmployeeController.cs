@@ -2,6 +2,7 @@
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
 using Presentation.Messaging;
@@ -80,6 +81,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
+        [Authorize]
         [HttpGet("EmployeesList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

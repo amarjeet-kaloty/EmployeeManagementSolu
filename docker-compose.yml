@@ -26,6 +26,18 @@ services:
       - ./rabbitmq-pubsub.yaml:/app/rabbitmq-pubsub.yaml
 
   # -----------------------------------------------------------------
+  #  KEYCLOAK SERVICE
+  # -----------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak_container
+    ports:
+      - "8080:8080"
+    command: start-dev
+    networks:
+      - dapr-network
+
+  # -----------------------------------------------------------------
   #  SERVICES
   # -----------------------------------------------------------------
   mongodb-service:

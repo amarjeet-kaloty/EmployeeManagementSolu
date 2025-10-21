@@ -5,8 +5,10 @@ using EmployeeManagementSolu.Domain.Validation;
 using EmployeeManagementSolu.Infrastructure;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Presentation.Filters;
 using RabbitMQ.Client;
@@ -42,7 +44,8 @@ builder.Services.AddControllers()
         {
             return new BadRequestObjectResult(new { message = "Invalid request data." });
         };
-    });
+    })
+    .AddDapr();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,7 +53,30 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile(new EmployeeProfile());
 });
-builder.Services.AddControllers().AddDapr();
+
+// Authentication and Authorization
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["Keycloak:Authority"];
+    options.Audience = builder.Configuration["Keycloak:Audience"];
+
+    options.RequireHttpsMetadata = false;
+
+    options.MapInboundClaims = false;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        RoleClaimType = "role"
+    };
+});
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -63,6 +89,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

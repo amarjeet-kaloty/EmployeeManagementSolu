@@ -4,8 +4,20 @@ services:
       - ConnectionStrings__MongoDB=mongodb://mongodb-service:27017/EmployeesCollection
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - Keycloak__Authority=http://keycloak:8080/realms/EmployeeManagementRealm
+      - Keycloak__Audience=employee-api
+      - Keycloak__ClientSecret=eX929zfRnPtaF0v02qqAOi0p15BBajMH
     ports:
       - "5000:8080"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+
+  keycloak:
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HTTP_ENABLED=true
