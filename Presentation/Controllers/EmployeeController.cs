@@ -2,6 +2,7 @@
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
 using Presentation.Messaging;
@@ -29,6 +30,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The newly created object, including its assigned ID.
         /// </returns>
+        [Authorize]
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -47,6 +49,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The updated object.
         /// </returns>
+        [Authorize]
         [HttpPut("Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,6 +67,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An integer representing the number of rows affected (typically 1 for successful deletion).
         /// </returns>
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
