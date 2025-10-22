@@ -52,6 +52,16 @@ builder.Services.AddAutoMapper(cfg =>
 });
 builder.Services.AddControllers().AddDapr();
 
+// OAuth 2.0 Local Config
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "http://localhost:8080/realms/EmployeeMgmtRealm";
+        options.Audience = "employee-api";
+        options.RequireHttpsMetadata = false;
+    });
+builder.Services.AddAuthorizationBuilder();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
