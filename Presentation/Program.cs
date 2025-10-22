@@ -56,7 +56,7 @@ builder.Services.AddControllers().AddDapr();
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://localhost:8080/realms/EmployeeMgmtRealm";
+        options.Authority = "http://keycloak:8080/realms/EmployeeMgmtRealm";
         options.Audience = "employee-api";
         options.RequireHttpsMetadata = false;
     });
