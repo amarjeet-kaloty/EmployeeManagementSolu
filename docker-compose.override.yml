@@ -12,5 +12,6 @@ services:
 
   keycloak:
     environment:
+      - KC_HOSTNAME=keycloak
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
