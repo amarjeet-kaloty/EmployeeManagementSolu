@@ -30,7 +30,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The newly created object, including its assigned ID.
         /// </returns>
-        [Authorize]
+        [Authorize(Policy = "SupervisorOnly")]
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -49,7 +49,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// The updated object.
         /// </returns>
-        [Authorize]
+        [Authorize(Policy = "SupervisorOrManager")]
         [HttpPut("Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -67,7 +67,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An integer representing the number of rows affected (typically 1 for successful deletion).
         /// </returns>
-        [Authorize]
+        [Authorize(Policy = "ManagerOnly")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
