@@ -24,20 +24,6 @@ services:
     ]
     volumes:
       - ./rabbitmq-pubsub.yaml:/app/rabbitmq-pubsub.yaml
-  
-  # -----------------------------------------------------------------
-  #  KEYCLOAK SERVICE
-  # -----------------------------------------------------------------
-  keycloak:
-    image: quay.io/keycloak/keycloak:latest
-    container_name: keycloak_container
-    ports:
-      - "8080:8080"
-    command: start-dev
-    volumes:
-      - keycloak-data:/opt/keycloak/data
-    networks:
-      - dapr-network
 
   # -----------------------------------------------------------------
   #  SERVICES
