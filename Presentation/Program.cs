@@ -56,11 +56,32 @@ builder.Services.AddControllers().AddDapr();
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
-        options.Authority = "http://keycloak:8080/realms/EmployeeMgmtRealm";
+        options.Authority = "http://localhost:8400/realms/EmployeeMgmtRealm";
         options.Audience = "employee-api";
         options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            NameClaimType = "preferred_username"
+        };
     });
-builder.Services.AddAuthorizationBuilder();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SupervisorOnly", policy =>
+    {
+        policy.RequireRole("supervisor");
+    });
+
+    options.AddPolicy("ManagerOnly", policy =>
+    {
+        policy.RequireRole("manager");
+    });
+
+    options.AddPolicy("SupervisorOrManager", policy =>
+    {
+        policy.RequireRole("supervisor", "manager");
+    });
+});
 
 var app = builder.Build();
 
@@ -72,6 +93,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
