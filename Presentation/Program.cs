@@ -79,6 +79,9 @@ builder.Services.AddSwaggerGen(options =>
             new string[] {}
         }
     });
+
+    options.SupportNonNullableReferenceTypes();
+    options.OperationFilter<SimplifyErrorResponseFilter>();
 });
 
 builder.Services.AddAutoMapper(cfg =>

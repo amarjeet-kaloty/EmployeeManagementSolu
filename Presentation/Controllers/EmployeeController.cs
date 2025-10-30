@@ -34,6 +34,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
@@ -52,8 +54,11 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [Authorize(Policy = "SupervisorOrManager")]
         [HttpPut("Update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
@@ -70,8 +75,10 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [Authorize(Policy = "ManagerOnly")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> DeleteEmployee(string id)
         {
             int employeeDeletedCount = await _mediator.Send(new DeleteEmployeeCommand() { Id = id });
@@ -88,6 +95,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpGet("EmployeesList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeeList()
         {
             List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
@@ -104,8 +113,10 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployee(string id)
         {
             ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByIdQuery() { Id = id });
@@ -123,8 +134,10 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [HttpGet("ByEmail/{email}")]
         [ValidateEmail]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ReadEmployeeDTO>> GetEmployeeByEmail(string email)
         {
             ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
