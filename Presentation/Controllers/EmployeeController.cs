@@ -84,6 +84,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("EmployeesList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -100,6 +101,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employee object corresponding to the provided unique identifier, if one exists.
         /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -117,6 +119,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// <returns>
         /// An employeeDTO object corresponding to the provided unique email identifier, if one exists.
         /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("ByEmail/{email}")]
         [ValidateEmail]
         [ProducesResponseType(StatusCodes.Status200OK)]

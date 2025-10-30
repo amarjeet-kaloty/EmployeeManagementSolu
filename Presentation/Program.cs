@@ -4,6 +4,8 @@ using EmployeeManagementSolu.Domain.Interfaces;
 using EmployeeManagementSolu.Domain.Validation;
 using EmployeeManagementSolu.Infrastructure;
 using FluentValidation;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -58,8 +60,9 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Description = "Please enter a valid Bearer Authorization token into the field.",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        BearerFormat = "JWT"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -85,18 +88,7 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddControllers().AddDapr();
 
 // OAuth 2.0 Local Config
-builder.Services.AddAuthentication()
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "http://localhost:8400/realms/EmployeeMgmtRealm";
-        options.Audience = "employee-api";
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-            NameClaimType = "preferred_username"
-        };
-    });
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SupervisorOnly", policy =>
@@ -113,7 +105,7 @@ builder.Services.AddAuthorization(options =>
     {
         policy.RequireRole("supervisor", "manager");
     });
-});
+}).AddKeycloakAuthorization(builder.Configuration);
 
 var app = builder.Build();
 
@@ -123,8 +115,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
