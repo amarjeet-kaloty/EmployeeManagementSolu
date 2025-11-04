@@ -92,6 +92,27 @@ builder.Services.AddControllers().AddDapr();
 
 // OAuth 2.0 Local Config
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
+
+builder.Services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    options.Events = new JwtBearerEvents();
+
+    options.Events.OnChallenge = context =>
+    {
+        context.HandleResponse();
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        context.Response.ContentType = "text/plain";
+         
+        string responseString = "Access Denied. A valid Bearer token is required.";
+        if (context.AuthenticateFailure != null)
+        {
+            responseString = $"Authentication Failed. Reason: {context.AuthenticateFailure.Message}";
+        }
+
+        return context.Response.WriteAsync(responseString);
+    };
+});
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SupervisorOnly", policy =>

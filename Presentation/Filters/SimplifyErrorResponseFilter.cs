@@ -8,23 +8,26 @@ namespace Presentation.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            string statusCodes = "404";
+            string[] statusCodes = new[] { "400", "401", "403", "404" };
 
             string problemDetailsSchemaId = typeof(ProblemDetails).Name;
-            if (operation.Responses.TryGetValue(statusCodes, out var response))
+            foreach (var statusCode in statusCodes)
             {
-                if (response.Content.TryGetValue("text/plain", out var mediaType))
+                if (operation.Responses.TryGetValue(statusCode, out var response))
                 {
-                    bool isProblemDetails = mediaType.Schema.Reference.Id == problemDetailsSchemaId;
-
-                    if (isProblemDetails)
+                    if (response.Content.TryGetValue("text/plain", out var mediaType))
                     {
-                        mediaType.Schema = new OpenApiSchema { Type = "string" };
-                        mediaType.Encoding = null;
+                        bool isProblemDetails = mediaType.Schema.Reference.Id == problemDetailsSchemaId;
+
+                        if (isProblemDetails)
+                        {
+                            mediaType.Schema = new OpenApiSchema { Type = "string" };
+                            mediaType.Encoding = null;
+                        }
                     }
+                    response.Content.Remove("application/json");
+                    response.Content.Remove("text/json");
                 }
-                response.Content.Remove("application/json"); 
-                response.Content.Remove("text/json"); 
             }
         }
     }
