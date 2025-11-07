@@ -1,4 +1,5 @@
-﻿using EmployeeManagementSolu.Application.Command.EmployeeCommands;
+﻿using Application.Query.EmployeeQueries;
+using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using MediatR;
@@ -39,8 +40,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
-            await _messagePublisher.PublishEmployeeCreatedEvent(
-               new { newEmployeeDto.Id, newEmployeeDto.Name, newEmployeeDto.Address, newEmployeeDto.Email, newEmployeeDto.Phone });
+            //await _messagePublisher.PublishEmployeeCreatedEvent(
+            //   new { newEmployeeDto.Id, newEmployeeDto.Name, newEmployeeDto.Address, newEmployeeDto.Email, newEmployeeDto.Phone, newEmployeeDto.DepartmentId });
             return Ok(newEmployeeDto);
         }
 
@@ -58,7 +59,6 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        
         public async Task<ActionResult<ReadEmployeeDTO>> UpdateEmployee([FromBody] UpdateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO updatedEmployee = await _mediator.Send(employeeDto);
@@ -142,6 +142,17 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         {
             ReadEmployeeDTO employee = await _mediator.Send(new GetEmployeeByEmailQuery { Email = email });
             return Ok(employee);
+        }
+
+        [HttpGet("ByDepartment")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> GetEmployeesByDepartment([FromQuery] Guid departmentId)
+        {
+            var employees = await _mediator.Send(new GetEmployeeByDepartmentIdQuery { DepartmentId = departmentId});
+            return Ok(employees);
         }
     }
 }

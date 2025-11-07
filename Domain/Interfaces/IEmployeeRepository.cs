@@ -10,5 +10,6 @@ namespace EmployeeManagementSolu.Domain.Interfaces
         public Task<List<Employee>> GetEmployeeListAsync();
         public Task<Employee> GetEmployeeByIdAsync(string id);
         public Task<Employee> GetEmployeeByEmailAsync(string email);
+        public Task<IEnumerable<Employee>> GetByDepartmentIdAsync(Guid departmentId);
     }
 }

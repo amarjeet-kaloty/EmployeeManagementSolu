@@ -27,6 +27,10 @@ namespace Infrastructure
             builder.Property(e => e.Phone)
                 .IsRequired(false)
                 .HasElementName("Employee_Phone");
+
+            builder.Property(e => e.DepartmentId)
+                .IsRequired()
+                .HasElementName("Employee_DepartmentId");
         }
     }
 }

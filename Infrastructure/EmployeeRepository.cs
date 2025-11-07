@@ -1,6 +1,7 @@
 ﻿using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace EmployeeManagementSolu.Infrastructure
 {
@@ -42,6 +43,11 @@ namespace EmployeeManagementSolu.Infrastructure
         public async Task<Employee> GetEmployeeByEmailAsync(string email)
         {
             return await _dbContext.Employees.FirstOrDefaultAsync(emp => emp.Email == email);
+        }
+
+        public async Task<IEnumerable<Employee>> GetByDepartmentIdAsync(Guid departmentId)
+        {
+            return await _dbContext.Employees.Where(e => e.DepartmentId == departmentId).ToListAsync();
         }
     }
 }

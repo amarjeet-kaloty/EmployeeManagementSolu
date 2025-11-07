@@ -14,7 +14,7 @@ namespace Application.Mappers
             CreateMap<UpdateEmployeeDTO, Employee>().ReverseMap();
 
             CreateMap<CreateEmployeeDTO, Employee>()
-                .ConstructUsing(dto => new Employee(ObjectId.GenerateNewId(), dto.Name, dto.Address, dto.Email, dto.Phone));
+                .ConstructUsing(dto => new Employee(ObjectId.GenerateNewId(), dto.Name, dto.Address, dto.Email, dto.Phone, dto.DepartmentId));
         }
     }
 }

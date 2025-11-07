@@ -1,5 +1,4 @@
-﻿
-namespace Application.Exceptions
+﻿namespace Application.Exceptions
 {
     public class NotFoundException : ApplicationException
     {
