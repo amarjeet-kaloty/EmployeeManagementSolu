@@ -40,8 +40,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         public async Task<ActionResult<ReadEmployeeDTO>> AddEmployee([FromBody] CreateEmployeeDTO employeeDto)
         {
             ReadEmployeeDTO newEmployeeDto = await _mediator.Send(employeeDto);
-            //await _messagePublisher.PublishEmployeeCreatedEvent(
-            //   new { newEmployeeDto.Id, newEmployeeDto.Name, newEmployeeDto.Address, newEmployeeDto.Email, newEmployeeDto.Phone, newEmployeeDto.DepartmentId });
+            await _messagePublisher.PublishEmployeeCreatedEvent(
+               new { newEmployeeDto.Id, newEmployeeDto.Name, newEmployeeDto.Address, newEmployeeDto.Email, newEmployeeDto.Phone, newEmployeeDto.DepartmentId });
             return Ok(newEmployeeDto);
         }
 
