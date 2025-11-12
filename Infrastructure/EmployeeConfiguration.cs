@@ -28,6 +28,22 @@ namespace Infrastructure
                 .IsRequired(false)
                 .HasElementName("Employee_Phone");
 
+            builder.Property(e => e.Age)
+               .IsRequired()
+               .HasElementName("Employee_Age");
+
+            builder.Property(e => e.Salary)
+               .IsRequired()
+               .HasElementName("Employee_Salary");
+
+            builder.Property(e => e.IsActive)
+               .IsRequired()
+               .HasElementName("Employee_IsActive");
+
+            builder.Property(e => e.JoiningDate)
+               .IsRequired()
+               .HasElementName("Employee_JoiningDate");
+
             builder.Property(e => e.DepartmentId)
                 .IsRequired()
                 .HasElementName("Employee_DepartmentId");

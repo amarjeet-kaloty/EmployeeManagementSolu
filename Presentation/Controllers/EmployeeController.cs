@@ -144,6 +144,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
             return Ok(employee);
         }
 
+        [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("ByDepartment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
