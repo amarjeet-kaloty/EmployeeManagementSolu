@@ -1,7 +1,7 @@
 services:
   presentation:
     environment:
-      - ConnectionStrings__MongoDB=mongodb://mongodb-service:27017/EmployeesCollection
+      - ConnectionStrings__MongoDB=mongodb://mongodb_container:27017/EmployeesCollection
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
     ports:
