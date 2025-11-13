@@ -1,9 +1,11 @@
 using Application.Mappers;
+using Domain.Services;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
 using EmployeeManagementSolu.Domain.Validation;
 using EmployeeManagementSolu.Infrastructure;
 using FluentValidation;
+using Infrastructure.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using MediatR;
@@ -47,6 +49,7 @@ builder.Services.AddControllers()
             return new BadRequestObjectResult(new { message = "Invalid request data." });
         };
     });
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

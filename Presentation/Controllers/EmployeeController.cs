@@ -149,9 +149,8 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         /// </summary>
         /// <param name="departmentId">The unique GUID of the department whose employees are to be retrieved.</param>
         /// <returns>
-        /// A Task representing the asynchronous operation, which on completion, returns an IActionResult.
-        /// The IActionResult contains a Status200OK with a list of employee DTOs for the specified department,
-        /// or a Status401Unauthorized/Status403Forbidden if authorization fails.
+        /// Department consisting details of all the employees or else an empty list.
+        /// </returns>
         [Authorize(Policy = "SupervisorOrManager")]
         [HttpGet("ByDepartment")]
         [ProducesResponseType(StatusCodes.Status200OK)]

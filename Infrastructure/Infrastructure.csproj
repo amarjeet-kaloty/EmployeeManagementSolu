@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="MongoDB.EntityFrameworkCore" Version="9.0.0" />
+		<PackageReference Include="Dapr.AspNetCore" Version="1.16.0" />
 	</ItemGroup>
 
   <ItemGroup>
