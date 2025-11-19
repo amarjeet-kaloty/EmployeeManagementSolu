@@ -4,7 +4,6 @@ using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
 using EmployeeManagementSolu.Domain.Entities;
-using EmployeeManagementSolu.Presentation.Controllers;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
@@ -21,6 +20,7 @@ using Presentation.Filters;
 using Presentation.Messaging;
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
+using Presentation.Controllers.V1;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {
@@ -38,7 +38,7 @@ namespace EmployeeManagementSolu.Presentation.Tests
             _logger = Substitute.For<ILogger<MessagePublisher>>();
             _daprClient = Substitute.For<DaprClient>();
             _messagePublisher = Substitute.For<MessagePublisher>(_logger, _daprClient);
-            _controller = new EmployeeController(_mediator, _messagePublisher);
+            _controller = new EmployeeV1Controller(_mediator, _messagePublisher);
         }
 
         #region Create Employee

@@ -1,4 +1,5 @@
 ﻿using Application.Query.EmployeeQueries;
+using Asp.Versioning;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
@@ -8,20 +9,23 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
 using Presentation.Messaging;
 
-namespace EmployeeManagementSolu.Presentation.Controllers
+namespace Presentation.Controllers.V1
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")] 
+    [ApiVersion("1.0")]
     [ServiceFilter(typeof(CustomExceptionFilterAttribute))]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly MessagePublisher _messagePublisher;
+        private readonly ILogger<EmployeeController> _logger;
 
-        public EmployeeController(IMediator mediator, MessagePublisher messagePublisher)
+        public EmployeeController(IMediator mediator, MessagePublisher messagePublisher, ILogger<EmployeeController> logger)
         {
             _mediator = mediator;
             _messagePublisher = messagePublisher;
+            _logger = logger;
         }
 
         /// <summary>
@@ -99,6 +103,7 @@ namespace EmployeeManagementSolu.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeeList()
         {
+            _logger.LogInformation("Version-1 Controller");
             List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
             return Ok(employeeList);
         }

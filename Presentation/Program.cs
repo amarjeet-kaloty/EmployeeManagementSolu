@@ -1,4 +1,7 @@
 using Application.Mappers;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using Domain.Services;
 using EmployeeManagementSolu.Domain.Entities;
 using EmployeeManagementSolu.Domain.Interfaces;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using Presentation.Controllers.Swagger;
 using Presentation.Filters;
 using RabbitMQ.Client;
 
@@ -53,11 +57,15 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile(new EmployeeProfile());
+});
+builder.Services.AddControllers().AddDapr();
+
 // Configuration: Swagger for Authorization and Authentication
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Employee API", Version = "v1" });
-
     options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -87,11 +95,18 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SimplifyErrorResponseFilter>();
 });
 
-builder.Services.AddAutoMapper(cfg =>
+builder.Services.AddApiVersioning(options =>
 {
-    cfg.AddProfile(new EmployeeProfile());
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
-builder.Services.AddControllers().AddDapr();
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 // OAuth 2.0 Local Config
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
@@ -140,7 +155,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+    app.UseSwaggerUI(options =>
+    {
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
+
 }
 
 app.UseAuthentication();

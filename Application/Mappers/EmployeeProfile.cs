@@ -27,6 +27,8 @@ namespace Application.Mappers
                     dto.DepartmentId
                 ))
                 .ReverseMap();
+
+            CreateMap<ReadEmployeeDTO, EmployeeBasicDTO>();
         }
     }
 }
