@@ -5,11 +5,11 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Presentation.Controllers.Swagger
 {
-    public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+    public class SwaggerAPIVersioningOptions : IConfigureOptions<SwaggerGenOptions>
     {
         private readonly IApiVersionDescriptionProvider _apiVersionDescriptionProvider;
 
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider apiVersionDescriptionProvider)
+        public SwaggerAPIVersioningOptions(IApiVersionDescriptionProvider apiVersionDescriptionProvider)
         {
             _apiVersionDescriptionProvider = apiVersionDescriptionProvider;
         }

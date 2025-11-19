@@ -95,6 +95,7 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SimplifyErrorResponseFilter>();
 });
 
+// API Versioning
 builder.Services.AddApiVersioning(options =>
 {
     options.AssumeDefaultVersionWhenUnspecified = true;
@@ -106,7 +107,7 @@ builder.Services.AddApiVersioning(options =>
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
-builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+builder.Services.ConfigureOptions<SwaggerAPIVersioningOptions>();
 
 // OAuth 2.0 Local Config
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
