@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Presentation.Controllers.Swagger
+namespace Presentation.Swagger
 {
     public class SwaggerAPIVersioningOptions : IConfigureOptions<SwaggerGenOptions>
     {

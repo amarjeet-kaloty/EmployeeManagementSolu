@@ -17,8 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
-using Presentation.Controllers.Swagger;
 using Presentation.Filters;
+using Presentation.Swagger;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
