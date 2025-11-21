@@ -20,7 +20,7 @@ using Presentation.Filters;
 using Presentation.Messaging;
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
-using Presentation.Controllers.V1;
+using Presentation.Controllers.Employees;
 
 namespace EmployeeManagementSolu.Presentation.Tests
 {

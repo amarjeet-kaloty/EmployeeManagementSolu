@@ -1,5 +1,6 @@
 ﻿using Application.Query.EmployeeQueries;
 using Asp.Versioning;
+using AutoMapper;
 using EmployeeManagementSolu.Application.Command.EmployeeCommands;
 using EmployeeManagementSolu.Application.DTOs;
 using EmployeeManagementSolu.Application.Query.EmployeeQueries;
@@ -9,23 +10,26 @@ using Microsoft.AspNetCore.Mvc;
 using Presentation.Filters;
 using Presentation.Messaging;
 
-namespace Presentation.Controllers.V1
+namespace Presentation.Controllers.Employees
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")] 
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [ServiceFilter(typeof(CustomExceptionFilterAttribute))]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly MessagePublisher _messagePublisher;
         private readonly ILogger<EmployeeController> _logger;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(IMediator mediator, MessagePublisher messagePublisher, ILogger<EmployeeController> logger)
+        public EmployeeController(IMediator mediator, MessagePublisher messagePublisher, ILogger<EmployeeController> logger, IMapper mapper)
         {
             _mediator = mediator;
             _messagePublisher = messagePublisher;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -96,16 +100,38 @@ namespace Presentation.Controllers.V1
         /// A List of Employees or an empty list if no employees are found.
         /// </returns>
         [Authorize(Policy = "SupervisorOrManager")]
-        [HttpGet("EmployeesList")]
+        [HttpGet("EmployeesList", Name = "GetEmployeesFullDetails")]
+        [MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeeList()
+        public async Task<ActionResult<List<ReadEmployeeDTO>>> GetEmployeesFullDetails()
         {
             _logger.LogInformation("Version-1 Controller");
             List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
             return Ok(employeeList);
+        }
+
+        /// <summary>
+        /// Retrieves a lightweight list of employees (Basic Info Only).
+        /// </summary>
+        /// <returns>
+        /// A List of Employees or an empty list if no employees are found.
+        /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
+        [HttpGet("EmployeesList", Name = "GetEmployeesBasicDetails")]
+        [MapToApiVersion("2.0")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<EmployeeBasicDTO>>> GetEmployeesBasicDetails()
+        {
+            _logger.LogInformation("Version-2 Controller");
+            List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
+            List<EmployeeBasicDTO> employeeBasicInfo = _mapper.Map<List<EmployeeBasicDTO>>(employeeList);
+            return Ok(employeeBasicInfo);
         }
 
         /// <summary>
