@@ -193,5 +193,53 @@ namespace Presentation.Controllers.Employees
             var employees = await _mediator.Send(new GetEmployeeByDepartmentIdQuery { DepartmentId = departmentId});
             return Ok(employees);
         }
+
+        /// <summary>
+        /// Retrieves an unfiltered list of all employees. This action is invoked when no 'searchTerm' query parameter is provided.
+        /// </summary>
+        /// <returns>
+        /// A lightweight List of ALL Employees.
+        /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
+        [HttpGet("Search")]
+        [MapToApiVersion("1.0")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<EmployeeBasicDTO>>> SearchEmployees()
+        {
+            _logger.LogInformation("Version-1 Search Controller: No Parameter.");
+            List<ReadEmployeeDTO> employeeList = await _mediator.Send(new GetEmployeeListQuery());
+            List<EmployeeBasicDTO> employeeBasicInfo = _mapper.Map<List<EmployeeBasicDTO>>(employeeList);
+            return Ok(employeeBasicInfo);
+        }
+
+        /// <summary>
+        /// Searches for employees matching a specific term in their name or email. This action is invoked when the 'searchTerm' query parameter IS provided.
+        /// </summary>
+        /// <param name="searchTerm">The term to search for in employee names or emails.</param>
+        /// <returns>
+        /// A lightweight List of Employees matching the search criteria.
+        /// </returns>
+        [Authorize(Policy = "SupervisorOrManager")]
+        [HttpGet("Search")]
+        [MapToApiVersion("2.0")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<List<EmployeeBasicDTO>>> SearchEmployees([FromQuery] string searchTerm)
+        {
+            _logger.LogInformation($"Version-2 Search Controller: With Parameter '{searchTerm}'.");
+            List<ReadEmployeeDTO> results = await _mediator.Send(new GetEmployeeListQuery());
+            var filteredList = results
+                .Where(e => e.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            e.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            List<EmployeeBasicDTO> basicInfo = _mapper.Map<List<EmployeeBasicDTO>>(filteredList);
+            return Ok(basicInfo);
+        }
     }
 }
