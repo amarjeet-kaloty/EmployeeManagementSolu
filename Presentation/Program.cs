@@ -150,6 +150,21 @@ builder.Services.AddAuthorization(options =>
     });
 }).AddKeycloakAuthorization(builder.Configuration);
 
+// Angular Configuration
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -168,6 +183,8 @@ if (app.Environment.IsDevelopment())
     });
 
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 
